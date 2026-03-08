@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Feature Importance & Selection — Car Price Dataset</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;700&family=Bricolage+Grotesque:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f5f0e8;
+  --paper: #faf7f2;
+  --ink: #1a1408;
+  --muted: #7a6e5e;
+  --border: #d8cfc0;
+  --accent: #c84b0f;
+  --accent2: #1d6b3a;
+  --accent3: #1a4a8a;
+  --code-bg: #16120a;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Bricolage Grotesque', sans-serif;
+  min-height: 100vh;
+  background-image:
+    radial-gradient(circle at 15% 50%, rgba(200,75,15,0.06) 0%, transparent 50%),
+    radial-gradient(circle at 85% 15%, rgba(29,107,58,0.04) 0%, transparent 40%);
+}
+
+.container { max-width: 920px; margin: 0 auto; padding: 60px 28px 100px; }
+
+/* ── HEADER ── */
+.header { margin-bottom: 60px; animation: fadeUp 0.5s ease both; }
+
+.topic-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: rgba(200,75,15,0.08);
+  border: 1.5px solid rgba(200,75,15,0.2);
+  padding: 6px 14px;
+  border-radius: 3px;
+  margin-bottom: 22px;
+}
+
+h1 {
+  font-size: clamp(2.6rem, 6vw, 4.2rem);
+  font-weight: 800;
+  line-height: 1.04;
+  letter-spacing: -0.03em;
+}
+h1 em { color: var(--accent); font-style: normal; }
+
+.tagline {
+  margin-top: 16px;
+  font-size: 1.05rem;
+  color: var(--muted);
+  font-weight: 400;
+  max-width: 560px;
+  line-height: 1.65;
+}
+
+.header-rule {
+  margin-top: 36px;
+  height: 3px;
+  background: repeating-linear-gradient(90deg, var(--ink) 0, var(--ink) 8px, transparent 8px, transparent 14px);
+  opacity: 0.12;
+}
+
+/* ── SECTION HEADERS ── */
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 26px;
+  padding-bottom: 14px;
+  border-bottom: 2px solid var(--border);
+}
+.section-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  background: var(--ink);
+  color: var(--bg);
+  padding: 5px 13px;
+  border-radius: 2px;
+}
+.section-label.orange { background: var(--accent); }
+.section-label.green  { background: var(--accent2); }
+
+.section-title { font-size: 1.45rem; font-weight: 700; }
+
+/* ── BLOCKS ── */
+.block { margin-bottom: 56px; animation: fadeUp 0.5s ease both; }
+.block:nth-child(2) { animation-delay: 0.06s; }
+.block:nth-child(3) { animation-delay: 0.12s; }
+.block:nth-child(4) { animation-delay: 0.18s; }
+
+/* ── STAT TILES ── */
+.stat-row {
+  display: grid;
+  grid-template-columns: repeat(4,1fr);
+  gap: 10px;
+  margin-bottom: 14px;
+}
+@media(max-width:580px){ .stat-row { grid-template-columns: 1fr 1fr; } }
+
+.stat-tile {
+  background: var(--paper);
+  border: 1.5px solid var(--border);
+  border-radius: 6px;
+  padding: 20px 16px;
+  text-align: center;
+  transition: border-color 0.2s;
+}
+.stat-tile:hover { border-color: var(--accent); }
+.stat-tile .val {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 1.65rem;
+  font-weight: 700;
+  color: var(--accent);
+  display: block;
+  margin-bottom: 5px;
+  line-height: 1;
+}
+.stat-tile .lbl {
+  font-size: 0.73rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 600;
+}
+
+/* ── CARDS ── */
+.card {
+  background: var(--paper);
+  border: 1.5px solid var(--border);
+  border-radius: 6px;
+  padding: 24px 28px;
+  margin-bottom: 14px;
+}
+.card.accent-red   { border-left: 4px solid var(--accent); }
+.card.accent-green { border-left: 4px solid var(--accent2); }
+.card.accent-blue  { border-left: 4px solid var(--accent3); }
+
+.card-eyebrow {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 7px; }
+.card p  { color: var(--muted); line-height: 1.72; font-size: 0.92rem; }
+.card p strong { color: var(--ink); }
+
+/* ── ISSUE GRID ── */
+.issue-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+@media(max-width:540px){ .issue-grid { grid-template-columns: 1fr; } }
+
+.issue-card {
+  background: var(--paper);
+  border: 1.5px solid var(--border);
+  border-radius: 6px;
+  padding: 18px 20px;
+  transition: border-color 0.2s;
+}
+.issue-card:hover { border-color: var(--accent); }
+.issue-icon { font-size: 1.4rem; margin-bottom: 8px; }
+.issue-card h4 { font-size: 0.88rem; font-weight: 700; margin-bottom: 5px; }
+.issue-card p  { font-size: 0.8rem; color: var(--muted); line-height: 1.55; }
+
+/* ── CODE BLOCK ── */
+.code-wrap {
+  background: var(--code-bg);
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 14px;
+  border: 1.5px solid rgba(255,255,255,0.05);
+  position: relative;
+}
+.code-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 14px;
+  background: rgba(255,255,255,0.035);
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.code-left { display: flex; align-items: center; gap: 12px; }
+.code-dots { display: flex; gap: 5px; }
+.code-dots span { width: 10px; height: 10px; border-radius: 50%; }
+.code-dots span:nth-child(1){ background:#ff5f57; }
+.code-dots span:nth-child(2){ background:#febc2e; }
+.code-dots span:nth-child(3){ background:#28c840; }
+.code-lang {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #555;
+}
+
+/* COPY BUTTON */
+.copy-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #555;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 4px;
+  padding: 5px 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+  user-select: none;
+}
+.copy-btn:hover { color: #a5d6a7; border-color: rgba(165,214,167,0.4); background: rgba(165,214,167,0.06); }
+.copy-btn.copied { color: #a5d6a7; border-color: rgba(165,214,167,0.4); }
+.copy-btn svg { flex-shrink: 0; }
+
+pre {
+  padding: 20px 22px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.8rem;
+  line-height: 1.85;
+  overflow-x: auto;
+  color: #d4c9b0;
+}
+.kw  { color: #f97583; }
+.fn  { color: #79c0ff; }
+.str { color: #a5d6a7; }
+.cm  { color: #4d4535; font-style: italic; }
+.var { color: #e3b341; }
+.num { color: #ff9580; }
+.imp { color: #c084fc; }
+.lit { color: #ffd700; }
+
+code {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.8em;
+  background: rgba(200,75,15,0.1);
+  color: var(--accent);
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+
+/* ── FEATURE IMPORTANCE CHART ── */
+.fi-chart {
+  background: var(--paper);
+  border: 1.5px solid var(--border);
+  border-radius: 6px;
+  padding: 26px 30px;
+  margin-bottom: 14px;
+}
+.fi-chart-title {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--muted);
+  margin-bottom: 22px;
+}
+.fi-row { display: flex; align-items: center; gap: 14px; margin-bottom: 11px; }
+.fi-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.73rem;
+  color: var(--ink);
+  min-width: 130px;
+  text-align: right;
+}
+.fi-bar-wrap { flex: 1; background: var(--border); border-radius: 2px; height: 24px; overflow: hidden; }
+.fi-bar {
+  height: 100%;
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  padding-left: 9px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: rgba(255,255,255,0.85);
+  transition: width 1.1s cubic-bezier(0.25,1,0.5,1);
+  white-space: nowrap;
+}
+.fi-pct {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--muted);
+  min-width: 44px;
+}
+.top-tag {
+  display: inline-block;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  background: white;
+  color: var(--accent);
+  padding: 2px 6px;
+  border-radius: 2px;
+  margin-left: 7px;
+  vertical-align: middle;
+}
+
+/* ── MODEL COMPARE ── */
+.compare-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+@media(max-width:500px){ .compare-grid { grid-template-columns: 1fr; } }
+
+.model-card {
+  background: var(--paper);
+  border: 1.5px solid var(--border);
+  border-radius: 6px;
+  padding: 26px 24px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.model-card.winner { border-color: var(--accent2); background: #f2faf4; }
+.model-badge { font-family: 'IBM Plex Mono', monospace; font-size: 9px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--muted); margin-bottom: 12px; }
+.model-score { font-family: 'IBM Plex Mono', monospace; font-size: 2.8rem; font-weight: 700; color: var(--ink); line-height: 1; margin-bottom: 5px; }
+.model-card.winner .model-score { color: var(--accent2); }
+.model-desc { font-size: 0.8rem; color: var(--muted); }
+.winner-tag {
+  position: absolute; top: 12px; right: 12px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 8px; text-transform: uppercase; letter-spacing: 0.1em;
+  background: var(--accent2); color: white;
+  padding: 3px 8px; border-radius: 2px;
+}
+
+/* ── STEP LIST ── */
+.step-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; }
+.step-row {
+  display: flex; align-items: flex-start; gap: 16px;
+  background: var(--paper); border: 1.5px solid var(--border);
+  border-radius: 6px; padding: 18px 22px;
+  transition: border-color 0.2s;
+}
+.step-row:hover { border-color: var(--accent); }
+.step-n { font-family: 'IBM Plex Mono', monospace; font-size: 1.1rem; font-weight: 700; color: var(--accent); min-width: 30px; padding-top: 1px; }
+.step-txt h4 { font-size: 0.92rem; font-weight: 700; margin-bottom: 4px; }
+.step-txt p  { font-size: 0.82rem; color: var(--muted); line-height: 1.6; }
+
+/* ── Q&A ACCORDION ── */
+.qa-section-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--muted);
+  margin-bottom: 12px;
+  padding-left: 2px;
+}
+
+.qa-item {
+  background: var(--paper);
+  border: 1.5px solid var(--border);
+  border-radius: 6px;
+  margin-bottom: 10px;
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+.qa-item:hover { border-color: rgba(200,75,15,0.4); }
+.qa-item.open  { border-color: var(--accent); }
+
+.qa-question {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px 22px;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.15s;
+}
+.qa-question:hover { background: rgba(200,75,15,0.03); }
+
+.qa-icon { font-size: 1.2rem; flex-shrink: 0; }
+
+.qa-q-text {
+  flex: 1;
+  font-size: 0.93rem;
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--ink);
+}
+.qa-q-text strong { color: var(--accent); }
+
+.qa-chevron {
+  flex-shrink: 0;
+  width: 20px; height: 20px;
+  border: 1.5px solid var(--border);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  transition: transform 0.25s, border-color 0.2s, background 0.2s;
+  color: var(--muted);
+}
+.qa-item.open .qa-chevron {
+  transform: rotate(180deg);
+  border-color: var(--accent);
+  background: rgba(200,75,15,0.08);
+  color: var(--accent);
+}
+
+.qa-answer {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.35s ease, padding 0.25s ease;
+  padding: 0 22px;
+  background: rgba(200,75,15,0.02);
+  border-top: 0px solid transparent;
+}
+.qa-item.open .qa-answer {
+  max-height: 500px;
+  padding: 16px 22px 20px;
+  border-top: 1px solid rgba(200,75,15,0.15);
+}
+
+.qa-answer p {
+  font-size: 0.88rem;
+  color: #4a3e2e;
+  line-height: 1.75;
+  font-weight: 400;
+}
+.qa-answer p strong { color: var(--accent); }
+.qa-answer .ans-badge {
+  display: inline-block;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  background: rgba(200,75,15,0.1);
+  color: var(--accent);
+  padding: 3px 8px;
+  border-radius: 2px;
+  margin-bottom: 10px;
+}
+
+/* ── DIVIDER ── */
+.divider { height: 2px; background: var(--border); margin: 52px 0; border-radius: 1px; }
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="topic-tag">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      Machine Learning — Feature Importance & Selection
+    </div>
+    <h1>Feature <em>Importance</em><br>& Selection</h1>
+    <p class="tagline">Which features actually drive car prices? Using the Car Details dataset — 8,128 real records — to find out with Random Forest.</p>
+    <div class="header-rule"></div>
+  </div>
+
+
+  <!-- ══════════ SECTION 1: LOAD & UNDERSTAND ══════════ -->
+  <div class="block">
+    <div class="section-header">
+      <div class="section-label">Section 01</div>
+      <div class="section-title">Load & Understand the Data</div>
+    </div>
+
+    <div class="stat-row">
+      <div class="stat-tile"><span class="val">8,128</span><span class="lbl">Total Rows</span></div>
+      <div class="stat-tile"><span class="val">13</span><span class="lbl">Columns</span></div>
+      <div class="stat-tile"><span class="val">1</span><span class="lbl">Target (Price)</span></div>
+      <div class="stat-tile"><span class="val">12</span><span class="lbl">Features</span></div>
+    </div>
+
+    <div class="code-wrap">
+      <div class="code-header">
+        <div class="code-left">
+          <div class="code-dots"><span></span><span></span><span></span></div>
+          <div class="code-lang">Step 1 — Load Dataset</div>
+        </div>
+        <button class="copy-btn" onclick="copyCode(this)">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          Copy
+        </button>
+      </div>
+      <pre data-code><span class="kw">import</span> <span class="imp">pandas</span> <span class="kw">as</span> <span class="var">pd</span>
+
+<span class="var">path</span> = <span class="str">r"D:\DATAMINES INDIA\AI & DS\Car_details - Car_details.csv"</span>
+<span class="var">dataset</span> = pd.<span class="fn">read_csv</span>(<span class="var">path</span>)
+
+<span class="fn">print</span>(<span class="var">dataset</span>.shape)     <span class="cm"># (8128, 13)</span>
+<span class="var">dataset</span>.<span class="fn">head</span>()           <span class="cm"># First 5 rows</span></pre>
+    </div>
+
+    <div class="card accent-red">
+      <div class="card-eyebrow">Dataset Columns</div>
+      <h3>Features Available</h3>
+      <p>
+        <strong>Numeric:</strong> year, selling_price, km_driven, seats<br>
+        <strong>String — needs parsing:</strong> mileage, engine, max_power, torque<br>
+        <strong>Categorical:</strong> fuel, seller_type, transmission, owner<br>
+        <strong>Text — drop it:</strong> name
+      </p>
+    </div>
+
+    <div class="issue-grid">
+      <div class="issue-card">
+        <div class="issue-icon">⚠️</div>
+        <h4>Missing Values</h4>
+        <p>mileage (221), engine (222), max_power (215), seats (221) — must handle before training.</p>
+      </div>
+      <div class="issue-card">
+        <div class="issue-icon">🔤</div>
+        <h4>String Numbers</h4>
+        <p>mileage is <code>"23.4 kmpl"</code>, engine is <code>"1248 CC"</code> — must extract numeric part.</p>
+      </div>
+      <div class="issue-card">
+        <div class="issue-icon">🧹</div>
+        <h4>Dirty Owner Column</h4>
+        <p>Contains junk values like <code>&amp;^GVDBJDKHH</code> — filter to valid categories only.</p>
+      </div>
+      <div class="issue-card">
+        <div class="issue-icon">🎯</div>
+        <h4>Target: selling_price</h4>
+        <p>Has 1 missing row and 1 negative value — drop both before training.</p>
+      </div>
+    </div>
+
+    <div class="code-wrap">
+      <div class="code-header">
+        <div class="code-left">
+          <div class="code-dots"><span></span><span></span><span></span></div>
+          <div class="code-lang">Step 2 — EDA</div>
+        </div>
+        <button class="copy-btn" onclick="copyCode(this)">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          Copy
+        </button>
+      </div>
+      <pre data-code><span class="var">dataset</span>.<span class="fn">info</span>()           <span class="cm"># Dtypes + missing values</span>
+<span class="var">dataset</span>.<span class="fn">describe</span>()        <span class="cm"># Mean, min, max, std</span>
+<span class="var">dataset</span>.isnull().<span class="fn">sum</span>()   <span class="cm"># Count missing per column</span>
+
+<span class="cm"># Check unique values in categorical columns</span>
+<span class="fn">print</span>(<span class="var">dataset</span>[<span class="str">'fuel'</span>].<span class="fn">unique</span>())
+<span class="fn">print</span>(<span class="var">dataset</span>[<span class="str">'owner'</span>].<span class="fn">unique</span>())   <span class="cm"># Notice the dirty values!</span></pre>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ══════════ SECTION 2: CLEAN → ENCODE → TRAIN ══════════ -->
+  <div class="block">
+    <div class="section-header">
+      <div class="section-label orange">Section 02</div>
+      <div class="section-title">Clean → Encode → Split → Train</div>
+    </div>
+
+    <div class="code-wrap">
+      <div class="code-header">
+        <div class="code-left">
+          <div class="code-dots"><span></span><span></span><span></span></div>
+          <div class="code-lang">Step 3 — Clean & Prepare</div>
+        </div>
+        <button class="copy-btn" onclick="copyCode(this)">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          Copy
+        </button>
+      </div>
+      <pre data-code><span class="kw">import</span> <span class="imp">numpy</span> <span class="kw">as</span> <span class="var">np</span>
+
+<span class="cm"># Drop rows with missing or negative target</span>
+<span class="var">df</span> = <span class="var">dataset</span>.<span class="fn">dropna</span>(subset=[<span class="str">'selling_price'</span>])
+<span class="var">df</span> = <span class="var">df</span>[<span class="var">df</span>[<span class="str">'selling_price'</span>] &gt; <span class="num">0</span>]
+
+<span class="cm"># Extract numbers from string columns</span>
+<span class="kw">def</span> <span class="fn">extract_num</span>(series):
+    <span class="kw">return</span> pd.to_numeric(
+        series.astype(str).str.<span class="fn">extract</span>(<span class="str">r'([\d.]+)'</span>)[<span class="num">0</span>], errors=<span class="str">'coerce'</span>
+    )
+
+<span class="var">df</span>[<span class="str">'mileage_num'</span>]   = <span class="fn">extract_num</span>(<span class="var">df</span>[<span class="str">'mileage'</span>])
+<span class="var">df</span>[<span class="str">'engine_num'</span>]    = <span class="fn">extract_num</span>(<span class="var">df</span>[<span class="str">'engine'</span>])
+<span class="var">df</span>[<span class="str">'max_power_num'</span>] = <span class="fn">extract_num</span>(<span class="var">df</span>[<span class="str">'max_power'</span>])
+
+<span class="cm"># Remove dirty owner values</span>
+<span class="var">valid_owners</span> = [<span class="str">'First Owner'</span>, <span class="str">'Second Owner'</span>,
+                <span class="str">'Third Owner'</span>, <span class="str">'Fourth & Above Owner'</span>, <span class="str">'Test Drive Car'</span>]
+<span class="var">df</span> = <span class="var">df</span>[<span class="var">df</span>[<span class="str">'owner'</span>].isin(<span class="var">valid_owners</span>)]</pre>
+    </div>
+
+    <div class="code-wrap">
+      <div class="code-header">
+        <div class="code-left">
+          <div class="code-dots"><span></span><span></span><span></span></div>
+          <div class="code-lang">Step 4 — Identify Features & Target</div>
+        </div>
+        <button class="copy-btn" onclick="copyCode(this)">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          Copy
+        </button>
+      </div>
+      <pre data-code><span class="var">features</span> = [<span class="str">'year'</span>, <span class="str">'km_driven'</span>, <span class="str">'fuel'</span>, <span class="str">'seller_type'</span>,
+            <span class="str">'transmission'</span>, <span class="str">'owner'</span>, <span class="str">'mileage_num'</span>, <span class="str">'engine_num'</span>,
+            <span class="str">'max_power_num'</span>, <span class="str">'seats'</span>]
+
+<span class="var">X</span> = <span class="var">df</span>[<span class="var">features</span>].<span class="fn">dropna</span>()
+<span class="var">y</span> = <span class="var">df</span>.loc[<span class="var">X</span>.index, <span class="str">'selling_price'</span>]
+
+<span class="cm"># One-hot encode categorical columns</span>
+<span class="var">X_encoded</span> = pd.<span class="fn">get_dummies</span>(<span class="var">X</span>, drop_first=<span class="lit">True</span>)
+<span class="fn">print</span>(<span class="var">X_encoded</span>.shape)  <span class="cm"># (7897, 16)</span></pre>
+    </div>
+
+    <div class="code-wrap">
+      <div class="code-header">
+        <div class="code-left">
+          <div class="code-dots"><span></span><span></span><span></span></div>
+          <div class="code-lang">Step 5 — Train Test Split</div>
+        </div>
+        <button class="copy-btn" onclick="copyCode(this)">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          Copy
+        </button>
+      </div>
+      <pre data-code><span class="kw">from</span> <span class="imp">sklearn.model_selection</span> <span class="kw">import</span> <span class="fn">train_test_split</span>
+
+<span class="var">X_train</span>, <span class="var">X_test</span>, <span class="var">y_train</span>, <span class="var">y_test</span> = <span class="fn">train_test_split</span>(
+    <span class="var">X_encoded</span>, <span class="var">y</span>, test_size=<span class="num">0.2</span>, random_state=<span class="num">42</span>
+)
+
+<span class="fn">print</span>(<span class="str">f"Train: {X_train.shape[0]} rows"</span>)  <span class="cm"># 6317</span>
+<span class="fn">print</span>(<span class="str">f"Test:  {X_test.shape[0]} rows"</span>)   <span class="cm"># 1580</span></pre>
+    </div>
+
+    <div class="code-wrap">
+      <div class="code-header">
+        <div class="code-left">
+          <div class="code-dots"><span></span><span></span><span></span></div>
+          <div class="code-lang">Step 6 — Feature Importance with Random Forest</div>
+        </div>
+        <button class="copy-btn" onclick="copyCode(this)">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          Copy
+        </button>
+      </div>
+      <pre data-code><span class="kw">from</span> <span class="imp">sklearn.ensemble</span> <span class="kw">import</span> <span class="fn">RandomForestRegressor</span>
+
+<span class="var">model</span> = <span class="fn">RandomForestRegressor</span>(n_estimators=<span class="num">100</span>, random_state=<span class="num">42</span>)
+<span class="var">model</span>.<span class="fn">fit</span>(<span class="var">X_train</span>, <span class="var">y_train</span>)
+
+<span class="cm"># Build importance table</span>
+<span class="var">fi</span> = pd.<span class="fn">DataFrame</span>({
+    <span class="str">'Feature'</span>:    <span class="var">X_encoded</span>.columns,
+    <span class="str">'Importance'</span>: <span class="var">model</span>.feature_importances_
+}).<span class="fn">sort_values</span>(<span class="str">'Importance'</span>, ascending=<span class="lit">False</span>)
+
+<span class="fn">print</span>(<span class="var">fi</span>.to_string())</pre>
+    </div>
+
+    <!-- REAL Feature Importance Chart -->
+    <div class="fi-chart">
+      <div class="fi-chart-title">📊 Real Results — Feature Importances from This Dataset</div>
+
+      <div class="fi-row">
+        <div class="fi-label">max_power_num</div>
+        <div class="fi-bar-wrap"><div class="fi-bar" style="width:0%;background:#c84b0f;" data-w="59.9">59.9% <span class="top-tag">TOP</span></div></div>
+        <div class="fi-pct">59.9%</div>
+      </div>
+      <div class="fi-row">
+        <div class="fi-label">year</div>
+        <div class="fi-bar-wrap"><div class="fi-bar" style="width:0%;background:#d4600a;" data-w="18.9">18.9%</div></div>
+        <div class="fi-pct">18.9%</div>
+      </div>
+      <div class="fi-row">
+        <div class="fi-label">km_driven</div>
+        <div class="fi-bar-wrap"><div class="fi-bar" style="width:0%;background:#c97a2a;" data-w="11.9">11.9%</div></div>
+        <div class="fi-pct">11.9%</div>
+      </div>
+      <div class="fi-row">
+        <div class="fi-label">seats</div>
+        <div class="fi-bar-wrap"><div class="fi-bar" style="width:0%;background:#1d6b3a;" data-w="3.3">3.3%</div></div>
+        <div class="fi-pct">3.3%</div>
+      </div>
+      <div class="fi-row">
+        <div class="fi-label">engine_num</div>
+        <div class="fi-bar-wrap"><div class="fi-bar" style="width:0%;background:#1a4a8a;" data-w="2.3">2.3%</div></div>
+        <div class="fi-pct">2.3%</div>
+      </div>
+      <div class="fi-row">
+        <div class="fi-label">mileage_num</div>
+        <div class="fi-bar-wrap"><div class="fi-bar" style="width:0%;background:#1a4a8a;" data-w="1.6">1.6%</div></div>
+        <div class="fi-pct">1.6%</div>
+      </div>
+      <div class="fi-row">
+        <div class="fi-label">owner_Second Owner</div>
+        <div class="fi-bar-wrap"><div class="fi-bar" style="width:0%;background:#6b4a8a;" data-w="1.1">1.1%</div></div>
+        <div class="fi-pct">1.1%</div>
+      </div>
+      <div class="fi-row">
+        <div class="fi-label">seller_type…</div>
+        <div class="fi-bar-wrap"><div class="fi-bar" style="width:0%;background:#888;" data-w="0.5">0.5%</div></div>
+        <div class="fi-pct">0.5%</div>
+      </div>
+      <div class="fi-row">
+        <div class="fi-label">fuel / transmission…</div>
+        <div class="fi-bar-wrap"><div class="fi-bar" style="width:0%;background:#bbb;" data-w="0.5">~0.3%</div></div>
+        <div class="fi-pct">&lt;0.5%</div>
+      </div>
+    </div>
+
+    <div class="code-wrap">
+      <div class="code-header">
+        <div class="code-left">
+          <div class="code-dots"><span></span><span></span><span></span></div>
+          <div class="code-lang">Step 7 — Visualize</div>
+        </div>
+        <button class="copy-btn" onclick="copyCode(this)">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          Copy
+        </button>
+      </div>
+      <pre data-code><span class="kw">import</span> <span class="imp">matplotlib.pyplot</span> <span class="kw">as</span> <span class="var">plt</span>
+
+<span class="var">fi</span>.<span class="fn">sort_values</span>(<span class="str">'Importance'</span>).<span class="fn">plot</span>(
+    x=<span class="str">'Feature'</span>, y=<span class="str">'Importance'</span>,
+    kind=<span class="str">'barh'</span>, figsize=(<span class="num">10</span>, <span class="num">6</span>),
+    color=<span class="str">'steelblue'</span>, legend=<span class="lit">False</span>
+)
+plt.<span class="fn">title</span>(<span class="str">'Feature Importance — Car Price Prediction'</span>)
+plt.<span class="fn">tight_layout</span>()
+plt.<span class="fn">show</span>()</pre>
+    </div>
+
+    <div class="code-wrap">
+      <div class="code-header">
+        <div class="code-left">
+          <div class="code-dots"><span></span><span></span><span></span></div>
+          <div class="code-lang">Step 8 — Select Top 5 Features</div>
+        </div>
+        <button class="copy-btn" onclick="copyCode(this)">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          Copy
+        </button>
+      </div>
+      <pre data-code><span class="cm"># Top 5: max_power_num, year, km_driven, seats, engine_num</span>
+<span class="var">top5</span> = <span class="var">fi</span>.<span class="fn">head</span>(<span class="num">5</span>)[<span class="str">'Feature'</span>].tolist()
+
+<span class="var">X_selected</span> = <span class="var">X_encoded</span>[<span class="var">top5</span>]
+
+<span class="var">X_train2</span>, <span class="var">X_test2</span>, <span class="var">y_train2</span>, <span class="var">y_test2</span> = <span class="fn">train_test_split</span>(
+    <span class="var">X_selected</span>, <span class="var">y</span>, test_size=<span class="num">0.2</span>, random_state=<span class="num">42</span>
+)
+
+<span class="var">model2</span> = <span class="fn">RandomForestRegressor</span>(n_estimators=<span class="num">100</span>, random_state=<span class="num">42</span>)
+<span class="var">model2</span>.<span class="fn">fit</span>(<span class="var">X_train2</span>, <span class="var">y_train2</span>)</pre>
+    </div>
+
+    <div class="compare-grid">
+      <div class="model-card">
+        <div class="model-badge">Model 1 — All 16 Features</div>
+        <div class="model-score">96.77%</div>
+        <div class="model-desc">R² Score on test set</div>
+      </div>
+      <div class="model-card winner">
+        <div class="winner-tag">Near-Equal ✓</div>
+        <div class="model-badge">Model 2 — Top 5 Features</div>
+        <div class="model-score">96.42%</div>
+        <div class="model-desc">R² Score on test set</div>
+      </div>
+    </div>
+
+    <div class="card accent-green">
+      <div class="card-eyebrow">Key Takeaway</div>
+      <h3>5 features → almost same accuracy as 16 features</h3>
+      <p>Using only <strong>max_power_num, year, km_driven, seats, engine_num</strong> gives 96.42% accuracy vs 96.77% with all features. This means <strong>11 of the 16 features contribute almost nothing</strong> — feature selection saves computation with no real loss.</p>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ══════════ SECTION 3: EXERCISE ══════════ -->
+  <div class="block">
+    <div class="section-header">
+      <div class="section-label green">Section 03</div>
+      <div class="section-title">Student Exercise</div>
+    </div>
+
+    <div class="step-list">
+      <div class="step-row">
+        <div class="step-n">01</div>
+        <div class="step-txt">
+          <h4>Find Top 5 Important Features</h4>
+          <p>Run the full pipeline, build the <code>fi</code> DataFrame, and print the top 5 features sorted by importance.</p>
+        </div>
+      </div>
+      <div class="step-row">
+        <div class="step-n">02</div>
+        <div class="step-txt">
+          <h4>Remove Least Important Features</h4>
+          <p>Drop the bottom 5 features. Hint: use <code>fi.tail(5)['Feature'].tolist()</code>, then drop those columns from X_encoded.</p>
+        </div>
+      </div>
+      <div class="step-row">
+        <div class="step-n">03</div>
+        <div class="step-txt">
+          <h4>Train Model Again</h4>
+          <p>Retrain <code>RandomForestRegressor</code> on the reduced feature set using the same <code>random_state=42</code>.</p>
+        </div>
+      </div>
+      <div class="step-row">
+        <div class="step-n">04</div>
+        <div class="step-txt">
+          <h4>Compare R² Scores</h4>
+          <p>Print both model scores. Did accuracy drop? By how much? Use <code>model.score(X_test, y_test)</code>.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Q&A ACCORDION -->
+    <div class="qa-section-label" style="margin-top:32px;">Discussion Questions — Click to reveal answer</div>
+
+    <div class="qa-item" onclick="toggleQA(this)">
+      <div class="qa-question">
+        <div class="qa-icon">🚗</div>
+        <div class="qa-q-text">Which feature affects car price the <strong>most</strong>? Why does engine power matter more than fuel type?</div>
+        <div class="qa-chevron">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+      </div>
+      <div class="qa-answer">
+        <div class="ans-badge">Answer</div>
+        <p><strong>max_power_num (engine power in bhp)</strong> is the top feature at 59.9% importance. Engine power directly reflects a car's performance tier — budget cars typically have 60–80 bhp while premium cars have 150+ bhp. Buyers and sellers both use performance as the primary pricing signal. Fuel type (Petrol/Diesel/CNG), by contrast, affects running costs but not the car's fundamental value tier — that's why it scores less than 1%.</p>
+      </div>
+    </div>
+
+    <div class="qa-item" onclick="toggleQA(this)">
+      <div class="qa-question">
+        <div class="qa-icon">📅</div>
+        <div class="qa-q-text">Why is <strong>year</strong> important? If two identical cars exist — one 2015, one 2022 — which costs more, and why?</div>
+        <div class="qa-chevron">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+      </div>
+      <div class="qa-answer">
+        <div class="ans-badge">Answer</div>
+        <p>The <strong>2022 car costs more</strong>. Year captures depreciation — cars lose value over time due to wear, outdated technology, and expired warranties. A newer car has more remaining lifespan, current safety features, and lower repair risk. Year scores 18.9% importance because this depreciation pattern is consistent across all 8,128 cars in the dataset. The model learned: <em>newer year → higher price</em>, almost universally.</p>
+      </div>
+    </div>
+
+    <div class="qa-item" onclick="toggleQA(this)">
+      <div class="qa-question">
+        <div class="qa-icon">🛣️</div>
+        <div class="qa-q-text">Why does <strong>km_driven</strong> reduce price? What does high mileage tell a buyer about a car?</div>
+        <div class="qa-chevron">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+      </div>
+      <div class="qa-answer">
+        <div class="ans-badge">Answer</div>
+        <p>High km_driven signals <strong>more engine wear, more stress on components, and higher near-future maintenance costs</strong>. A car with 200,000 km is likely to need major servicing soon — clutch replacement, engine overhaul, suspension work. Buyers price this risk in. km_driven scores 11.9% importance because this relationship is consistent: more kilometers = more wear = lower price. It is essentially measuring how much "life" is left in the car.</p>
+      </div>
+    </div>
+
+    <div class="qa-item" onclick="toggleQA(this)">
+      <div class="qa-question">
+        <div class="qa-icon">⛽</div>
+        <div class="qa-q-text">Why did <strong>fuel type</strong> score very low importance? Is fuel type truly irrelevant to price?</div>
+        <div class="qa-chevron">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+      </div>
+      <div class="qa-answer">
+        <div class="ans-badge">Answer</div>
+        <p>Fuel type is <strong>not truly irrelevant</strong> — Diesel cars do tend to cost more than Petrol — but the model finds it less important because <strong>engine power already captures most of this signal</strong>. Diesel cars typically have higher bhp and torque, so once max_power is known, fuel type adds little extra information. This is called <em>feature correlation</em> — two features that carry overlapping information. The model effectively says: "If I already know the power output, knowing the fuel type doesn't tell me much more about the price."</p>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+// Animate bars
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    document.querySelectorAll('.fi-bar').forEach(bar => {
+      bar.style.width = bar.getAttribute('data-w') + '%';
+    });
+  }, 300);
+});
+
+// Copy code
+function copyCode(btn) {
+  const pre = btn.closest('.code-wrap').querySelector('pre[data-code]');
+  const text = pre.innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.classList.add('copied');
+    btn.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Copied!`;
+    setTimeout(() => {
+      btn.classList.remove('copied');
+      btn.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy`;
+    }, 2000);
+  });
+}
+
+// Q&A toggle
+function toggleQA(item) {
+  const isOpen = item.classList.contains('open');
+  document.querySelectorAll('.qa-item.open').forEach(i => i.classList.remove('open'));
+  if (!isOpen) item.classList.add('open');
+}
+</script>
+</body>
+</html>

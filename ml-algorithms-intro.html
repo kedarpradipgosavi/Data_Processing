@@ -1,0 +1,1165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ML Algorithms — Introduction + Libraries</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:      #080c10;
+  --surface: #0d1117;
+  --card:    #111722;
+  --card2:   #141b25;
+  --border:  #1e2a3a;
+  --border2: #243040;
+  --text:    #dde3ed;
+  --muted:   #5a6880;
+  --dim:     #8494aa;
+  --code-bg: #070a0e;
+
+  --blue:    #3b82f6;
+  --teal:    #14b8a6;
+  --amber:   #f59e0b;
+  --rose:    #f43f5e;
+  --violet:  #8b5cf6;
+  --green:   #22c55e;
+  --cyan:    #06b6d4;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Syne', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Ambient glow blobs */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 40% at 10% 20%, rgba(59,130,246,0.05) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 35% at 90% 80%, rgba(20,184,166,0.04) 0%, transparent 55%),
+    radial-gradient(ellipse 40% 30% at 50% 50%, rgba(139,92,246,0.03) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Subtle grid */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(59,130,246,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(59,130,246,0.025) 1px, transparent 1px);
+  background-size: 48px 48px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.container {
+  max-width: 940px;
+  margin: 0 auto;
+  padding: 64px 28px 100px;
+  position: relative;
+  z-index: 1;
+}
+
+/* ── HEADER ── */
+.header { margin-bottom: 72px; animation: fadeUp 0.6s ease both; }
+
+.topic-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--blue);
+  background: rgba(59,130,246,0.08);
+  border: 1px solid rgba(59,130,246,0.22);
+  padding: 7px 14px;
+  border-radius: 3px;
+  margin-bottom: 24px;
+}
+
+h1 {
+  font-size: clamp(2.8rem, 6vw, 4.4rem);
+  font-weight: 800;
+  line-height: 1.03;
+  letter-spacing: -0.03em;
+  color: #fff;
+}
+h1 .hl { color: var(--blue); }
+h1 .hl2 { color: var(--teal); }
+
+.tagline {
+  margin-top: 18px;
+  font-size: 1.05rem;
+  color: var(--dim);
+  font-weight: 400;
+  max-width: 560px;
+  line-height: 1.65;
+}
+
+.header-line {
+  margin-top: 36px;
+  height: 1px;
+  background: linear-gradient(90deg, var(--blue), var(--teal), transparent);
+  opacity: 0.35;
+}
+
+/* ── SECTION ── */
+.section { margin-bottom: 64px; animation: fadeUp 0.5s ease both; }
+.section:nth-child(2) { animation-delay: 0.07s; }
+.section:nth-child(3) { animation-delay: 0.14s; }
+.section:nth-child(4) { animation-delay: 0.21s; }
+.section:nth-child(5) { animation-delay: 0.28s; }
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 30px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.sec-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  padding: 5px 13px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+.sec-badge.b1 { background: rgba(59,130,246,0.15); color: var(--blue); border: 1px solid rgba(59,130,246,0.25); }
+.sec-badge.b2 { background: rgba(20,184,166,0.12); color: var(--teal); border: 1px solid rgba(20,184,166,0.22); }
+.sec-badge.b3 { background: rgba(245,158,11,0.12); color: var(--amber); border: 1px solid rgba(245,158,11,0.22); }
+.sec-badge.b4 { background: rgba(34,197,94,0.12); color: var(--green); border: 1px solid rgba(34,197,94,0.22); }
+
+.sec-title { font-size: 1.5rem; font-weight: 700; color: #fff; }
+
+/* ── ALGORITHM CARDS ── */
+.algo-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+@media(max-width:620px){ .algo-grid { grid-template-columns: 1fr; } }
+
+.algo-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 22px 24px;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.algo-card:hover { transform: translateY(-2px); }
+
+.algo-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 2px;
+}
+.algo-card.c-blue::before   { background: var(--blue); }
+.algo-card.c-teal::before   { background: var(--teal); }
+.algo-card.c-amber::before  { background: var(--amber); }
+.algo-card.c-violet::before { background: var(--violet); }
+.algo-card.c-rose::before   { background: var(--rose); }
+
+.algo-card:hover { border-color: var(--border2); }
+
+.algo-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 10px; gap: 10px; }
+
+.algo-name { font-size: 1rem; font-weight: 700; color: #fff; }
+
+.type-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 3px 9px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+.tt-reg   { background: rgba(59,130,246,0.12); color: var(--blue); }
+.tt-cls   { background: rgba(20,184,166,0.12); color: var(--teal); }
+.tt-both  { background: rgba(139,92,246,0.12); color: var(--violet); }
+
+.algo-desc { font-size: 0.83rem; color: var(--dim); line-height: 1.65; font-weight: 400; margin-bottom: 12px; }
+
+.algo-when {
+  font-size: 0.78rem;
+  color: var(--muted);
+  font-family: 'JetBrains Mono', monospace;
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  line-height: 1.5;
+}
+.algo-when-label {
+  color: var(--amber);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  flex-shrink: 0;
+  padding-top: 1px;
+}
+
+/* full-width 5th card */
+.algo-card-wide {
+  grid-column: 1 / -1;
+}
+
+/* ── MODEL TABLE ── */
+.model-table-wrap {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+thead th {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-align: left;
+  padding: 12px 20px;
+  background: rgba(255,255,255,0.02);
+  border-bottom: 1px solid var(--border);
+  font-weight: 400;
+}
+
+tbody td {
+  padding: 13px 20px;
+  border-bottom: 1px solid rgba(30,42,58,0.5);
+  font-size: 0.87rem;
+  color: var(--dim);
+  vertical-align: middle;
+}
+tbody tr:last-child td { border-bottom: none; }
+tbody tr:hover td { background: rgba(255,255,255,0.015); }
+
+.td-model { font-weight: 700; color: #fff; }
+.td-type span {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  padding: 3px 9px;
+  border-radius: 2px;
+}
+
+/* ── LIBRARY CARDS ── */
+.lib-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+@media(max-width:580px){ .lib-grid { grid-template-columns: 1fr; } }
+
+.lib-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+.lib-card:hover { border-color: var(--border2); }
+
+.lib-header {
+  padding: 14px 18px 10px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.lib-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.lib-module {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--dim);
+  font-weight: 400;
+}
+.lib-model-name { font-size: 0.88rem; font-weight: 700; color: #fff; margin-left: auto; }
+
+.lib-code {
+  padding: 14px 18px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.76rem;
+  line-height: 1.75;
+  color: #c9d1d9;
+}
+
+/* ── CODE BLOCKS ── */
+.code-wrap {
+  background: var(--code-bg);
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 14px;
+  border: 1px solid rgba(255,255,255,0.05);
+  position: relative;
+}
+.code-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 14px;
+  background: rgba(255,255,255,0.03);
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.code-left { display: flex; align-items: center; gap: 12px; }
+.code-dots { display: flex; gap: 5px; }
+.code-dots span { width: 10px; height: 10px; border-radius: 50%; }
+.code-dots span:nth-child(1){ background:#ff5f57; }
+.code-dots span:nth-child(2){ background:#febc2e; }
+.code-dots span:nth-child(3){ background:#28c840; }
+.code-lang {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #444;
+}
+
+.copy-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #444;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 4px;
+  padding: 5px 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+  user-select: none;
+}
+.copy-btn:hover { color: var(--teal); border-color: rgba(20,184,166,0.35); background: rgba(20,184,166,0.06); }
+.copy-btn.copied { color: var(--teal); border-color: rgba(20,184,166,0.35); }
+
+pre {
+  padding: 20px 22px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem;
+  line-height: 1.85;
+  overflow-x: auto;
+  color: #bec9da;
+}
+.kw  { color: #f97583; }
+.fn  { color: #79c0ff; }
+.str { color: #a5d6a7; }
+.cm  { color: #3a4455; font-style: italic; }
+.var { color: #e3b341; }
+.num { color: #ff9580; }
+.imp { color: #c084fc; }
+.lit { color: #ffd700; }
+.cls { color: #56d364; }
+
+code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8em;
+  background: rgba(59,130,246,0.1);
+  color: var(--blue);
+  padding: 2px 7px;
+  border-radius: 3px;
+}
+
+/* ── INFO CARD ── */
+.info-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 24px 28px;
+  margin-bottom: 14px;
+}
+.info-card.ic-blue  { border-left: 3px solid var(--blue); }
+.info-card.ic-teal  { border-left: 3px solid var(--teal); }
+.info-card.ic-amber { border-left: 3px solid var(--amber); }
+.info-card.ic-green { border-left: 3px solid var(--green); }
+
+.ic-eyebrow {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.info-card h3 { font-size: 0.98rem; font-weight: 700; color: #fff; margin-bottom: 8px; }
+.info-card p  { font-size: 0.88rem; color: var(--dim); line-height: 1.72; }
+.info-card p strong { color: var(--text); }
+
+/* ── PIPELINE STEPS ── */
+.pipeline {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0;
+  margin-bottom: 16px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+@media(max-width:700px){
+  .pipeline { grid-template-columns: 1fr 1fr; }
+  .pipe-arrow { display: none; }
+}
+
+.pipe-step {
+  padding: 20px 12px;
+  text-align: center;
+  border-right: 1px solid var(--border);
+  position: relative;
+}
+.pipe-step:last-child { border-right: none; }
+
+.pipe-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  color: var(--muted);
+  margin-bottom: 7px;
+  letter-spacing: 0.1em;
+}
+.pipe-icon { font-size: 1.4rem; margin-bottom: 8px; }
+.pipe-name {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.3;
+}
+
+/* ── STEP LIST ── */
+.step-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; }
+.step-row {
+  display: flex; align-items: flex-start; gap: 16px;
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 8px; padding: 18px 22px;
+  transition: border-color 0.2s;
+}
+.step-row:hover { border-color: var(--border2); }
+.step-n { font-family: 'JetBrains Mono', monospace; font-size: 1.1rem; font-weight: 700; color: var(--blue); min-width: 30px; padding-top: 1px; }
+.step-txt h4 { font-size: 0.92rem; font-weight: 700; margin-bottom: 4px; color: #fff; }
+.step-txt p  { font-size: 0.82rem; color: var(--dim); line-height: 1.6; }
+
+/* ── ASSIGNMENT CARD ── */
+.assignment {
+  background: var(--card2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 32px 36px;
+  margin-bottom: 14px;
+  position: relative;
+  overflow: hidden;
+}
+.assignment::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--blue), var(--teal), var(--violet));
+}
+.asgn-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--amber);
+  background: rgba(245,158,11,0.1);
+  border: 1px solid rgba(245,158,11,0.2);
+  padding: 5px 12px;
+  border-radius: 2px;
+  margin-bottom: 16px;
+}
+.assignment h3 { font-size: 1.1rem; font-weight: 700; color: #fff; margin-bottom: 6px; }
+.assignment p  { font-size: 0.88rem; color: var(--dim); line-height: 1.7; margin-bottom: 20px; }
+
+.asgn-steps { display: flex; flex-direction: column; gap: 8px; }
+.asgn-step {
+  display: flex; align-items: flex-start; gap: 14px;
+  padding: 13px 16px;
+  background: rgba(255,255,255,0.025);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+.asgn-n {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--amber);
+  min-width: 24px;
+  padding-top: 1px;
+}
+.asgn-txt { font-size: 0.84rem; color: var(--dim); line-height: 1.55; }
+.asgn-txt strong { color: var(--text); }
+
+.dataset-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+}
+.dataset-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 10px 16px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.dataset-pill span { font-size: 1.2rem; }
+
+/* ── Q&A ACCORDION ── */
+.qa-heading {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--muted);
+  margin-bottom: 12px;
+  padding-left: 2px;
+}
+
+.qa-item {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin-bottom: 8px;
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+.qa-item:hover { border-color: var(--border2); }
+.qa-item.open  { border-color: var(--blue); }
+
+.qa-question {
+  display: flex; align-items: center; gap: 14px;
+  padding: 17px 22px;
+  cursor: pointer;
+  user-select: none;
+}
+.qa-question:hover { background: rgba(59,130,246,0.03); }
+
+.qa-icon { font-size: 1.1rem; flex-shrink: 0; }
+.qa-q-text { flex: 1; font-size: 0.92rem; font-weight: 600; line-height: 1.5; color: var(--text); }
+.qa-q-text strong { color: var(--blue); }
+
+.qa-chevron {
+  flex-shrink: 0; width: 22px; height: 22px;
+  border: 1px solid var(--border); border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  transition: transform 0.25s, border-color 0.2s, background 0.2s;
+  color: var(--muted);
+}
+.qa-item.open .qa-chevron {
+  transform: rotate(180deg);
+  border-color: var(--blue);
+  background: rgba(59,130,246,0.1);
+  color: var(--blue);
+}
+
+.qa-answer {
+  max-height: 0; overflow: hidden;
+  transition: max-height 0.35s ease, padding 0.25s ease;
+  padding: 0 22px;
+  background: rgba(59,130,246,0.02);
+  border-top: 0px solid transparent;
+}
+.qa-item.open .qa-answer {
+  max-height: 600px;
+  padding: 16px 22px 20px;
+  border-top: 1px solid rgba(59,130,246,0.12);
+}
+.qa-answer p {
+  font-size: 0.87rem;
+  color: var(--dim);
+  line-height: 1.78;
+}
+.qa-answer p strong { color: var(--text); }
+.ans-badge {
+  display: inline-block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  background: rgba(59,130,246,0.1);
+  color: var(--blue);
+  padding: 3px 8px;
+  border-radius: 2px;
+  margin-bottom: 10px;
+}
+
+/* ── DIVIDER ── */
+.divider { height: 1px; background: var(--border); margin: 56px 0; }
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="topic-pill">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+      Machine Learning — Algorithms + Libraries
+    </div>
+    <h1>ML <span class="hl">Algorithms</span><br><span class="hl2">Introduction</span></h1>
+    <p class="tagline">5 essential algorithms, the sklearn libraries that power them, a full pipeline walkthrough, and a hands-on assignment.</p>
+    <div class="header-line"></div>
+  </div>
+
+
+  <!-- ══════════════ SECTION 1: ALGORITHM CATEGORIES ══════════════ -->
+  <div class="section">
+    <div class="section-header">
+      <div class="sec-badge b1">Section 01</div>
+      <div class="sec-title">ML Algorithm Categories</div>
+    </div>
+
+    <div class="algo-grid">
+
+      <!-- 1. Linear Regression -->
+      <div class="algo-card c-blue">
+        <div class="algo-header">
+          <div class="algo-name">Linear Regression</div>
+          <div class="type-tag tt-reg">Regression</div>
+        </div>
+        <div class="algo-desc">Finds the best-fit straight line through data points. Predicts a continuous numeric output by learning the relationship between input features and a target value.</div>
+        <div class="algo-when">
+          <span class="algo-when-label">Use when →</span>
+          Predicting numbers: house prices, salaries, temperatures, stock values
+        </div>
+      </div>
+
+      <!-- 2. Logistic Regression -->
+      <div class="algo-card c-teal">
+        <div class="algo-header">
+          <div class="algo-name">Logistic Regression</div>
+          <div class="type-tag tt-cls">Classification</div>
+        </div>
+        <div class="algo-desc">Despite the name, it's a classifier. Uses a sigmoid function to output a probability between 0 and 1, then assigns a class label based on a threshold (typically 0.5).</div>
+        <div class="algo-when">
+          <span class="algo-when-label">Use when →</span>
+          Binary yes/no decisions: spam/not spam, disease/no disease, churn/no churn
+        </div>
+      </div>
+
+      <!-- 3. Decision Tree -->
+      <div class="algo-card c-amber">
+        <div class="algo-header">
+          <div class="algo-name">Decision Tree</div>
+          <div class="type-tag tt-both">Both</div>
+        </div>
+        <div class="algo-desc">Splits data step-by-step using if-else rules, building a tree structure. Each node asks a question about a feature; branches lead to the next question until a final answer is reached.</div>
+        <div class="algo-when">
+          <span class="algo-when-label">Use when →</span>
+          You need explainability — doctors, banks, legal decisions where reasoning must be visible
+        </div>
+      </div>
+
+      <!-- 4. Random Forest -->
+      <div class="algo-card c-violet">
+        <div class="algo-header">
+          <div class="algo-name">Random Forest</div>
+          <div class="type-tag tt-both">Both</div>
+        </div>
+        <div class="algo-desc">An ensemble of hundreds of decision trees trained on random subsets of data and features. Final prediction = majority vote (classification) or average (regression). Much more accurate than a single tree.</div>
+        <div class="algo-when">
+          <span class="algo-when-label">Use when →</span>
+          High accuracy needed with mixed data types — tabular datasets, medical records, fraud detection
+        </div>
+      </div>
+
+      <!-- 5. SVM — full width -->
+      <div class="algo-card c-rose algo-card-wide">
+        <div class="algo-header">
+          <div class="algo-name">Support Vector Machine (SVM)</div>
+          <div class="type-tag tt-both">Both</div>
+        </div>
+        <div class="algo-desc">Finds the hyperplane (a line in 2D, a plane in 3D) that maximally separates two classes with the widest possible margin. Uses "support vectors" — the closest data points to the boundary — to define it. Works in high-dimensional spaces via the kernel trick.</div>
+        <div class="algo-when">
+          <span class="algo-when-label">Use when →</span>
+          Small-to-medium datasets with complex boundaries — image classification, text categorization, bioinformatics
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Model Type Reference Table -->
+    <div class="model-table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Model</th>
+            <th>Type</th>
+            <th>Output</th>
+            <th>Best For</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="td-model">Linear Regression</td>
+            <td class="td-type"><span class="tt-reg">Regression</span></td>
+            <td>Continuous number</td>
+            <td>Price prediction, forecasting</td>
+          </tr>
+          <tr>
+            <td class="td-model">Logistic Regression</td>
+            <td class="td-type"><span class="tt-cls">Classification</span></td>
+            <td>0 or 1 (probability)</td>
+            <td>Binary decisions, medical diagnosis</td>
+          </tr>
+          <tr>
+            <td class="td-model">Decision Tree</td>
+            <td class="td-type"><span class="tt-both">Both</span></td>
+            <td>Label or number</td>
+            <td>Explainable decisions, rule-based logic</td>
+          </tr>
+          <tr>
+            <td class="td-model">Random Forest</td>
+            <td class="td-type"><span class="tt-both">Both</span></td>
+            <td>Label or number</td>
+            <td>High accuracy, tabular data</td>
+          </tr>
+          <tr>
+            <td class="td-model">SVM</td>
+            <td class="td-type"><span class="tt-both">Both</span></td>
+            <td>Label or number</td>
+            <td>High-dimensional, complex boundaries</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ══════════════ SECTION 2: LIBRARIES ══════════════ -->
+  <div class="section">
+    <div class="section-header">
+      <div class="sec-badge b2">Section 02</div>
+      <div class="sec-title">sklearn Libraries Overview</div>
+    </div>
+
+    <div class="lib-grid">
+      <!-- Linear Regression -->
+      <div class="lib-card">
+        <div class="lib-header">
+          <div class="lib-dot" style="background:var(--blue)"></div>
+          <div class="lib-module">sklearn.linear_model</div>
+          <div class="lib-model-name">Linear Regression</div>
+        </div>
+        <div class="lib-code">
+          <span class="kw">from</span> <span class="imp">sklearn.linear_model</span> <span class="kw">import</span> <span class="cls">LinearRegression</span>
+        </div>
+      </div>
+      <!-- Logistic Regression -->
+      <div class="lib-card">
+        <div class="lib-header">
+          <div class="lib-dot" style="background:var(--teal)"></div>
+          <div class="lib-module">sklearn.linear_model</div>
+          <div class="lib-model-name">Logistic Regression</div>
+        </div>
+        <div class="lib-code">
+          <span class="kw">from</span> <span class="imp">sklearn.linear_model</span> <span class="kw">import</span> <span class="cls">LogisticRegression</span>
+        </div>
+      </div>
+      <!-- Decision Tree Classifier -->
+      <div class="lib-card">
+        <div class="lib-header">
+          <div class="lib-dot" style="background:var(--amber)"></div>
+          <div class="lib-module">sklearn.tree</div>
+          <div class="lib-model-name">Decision Tree</div>
+        </div>
+        <div class="lib-code">
+          <span class="kw">from</span> <span class="imp">sklearn.tree</span> <span class="kw">import</span> <span class="cls">DecisionTreeClassifier</span>
+        </div>
+      </div>
+      <!-- Random Forest -->
+      <div class="lib-card">
+        <div class="lib-header">
+          <div class="lib-dot" style="background:var(--violet)"></div>
+          <div class="lib-module">sklearn.ensemble</div>
+          <div class="lib-model-name">Random Forest</div>
+        </div>
+        <div class="lib-code">
+          <span class="kw">from</span> <span class="imp">sklearn.ensemble</span> <span class="kw">import</span> <span class="cls">RandomForestClassifier</span>
+        </div>
+      </div>
+      <!-- SVM -->
+      <div class="lib-card">
+        <div class="lib-header">
+          <div class="lib-dot" style="background:var(--rose)"></div>
+          <div class="lib-module">sklearn.svm</div>
+          <div class="lib-model-name">SVM</div>
+        </div>
+        <div class="lib-code">
+          <span class="kw">from</span> <span class="imp">sklearn.svm</span> <span class="kw">import</span> <span class="cls">SVC</span>
+        </div>
+      </div>
+      <!-- Metrics -->
+      <div class="lib-card">
+        <div class="lib-header">
+          <div class="lib-dot" style="background:var(--green)"></div>
+          <div class="lib-module">sklearn.metrics</div>
+          <div class="lib-model-name">Evaluation</div>
+        </div>
+        <div class="lib-code">
+          <span class="kw">from</span> <span class="imp">sklearn.metrics</span> <span class="kw">import</span> <span class="cls">accuracy_score</span>, <span class="cls">confusion_matrix</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-card ic-blue">
+      <div class="ic-eyebrow">Pattern to Remember</div>
+      <h3>All sklearn models follow the same 3-step API</h3>
+      <p><strong>1. Instantiate</strong> — <code>model = RandomForestClassifier()</code><br>
+         <strong>2. Fit</strong> — <code>model.fit(X_train, y_train)</code><br>
+         <strong>3. Predict</strong> — <code>model.predict(X_test)</code><br>
+         This is the same for every single sklearn model. Learn it once, use it everywhere.</p>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ══════════════ SECTION 3: FULL PIPELINE ══════════════ -->
+  <div class="section">
+    <div class="section-header">
+      <div class="sec-badge b3">Section 03</div>
+      <div class="sec-title">Full ML Pipeline</div>
+    </div>
+
+    <!-- Pipeline Visual -->
+    <div class="pipeline">
+      <div class="pipe-step">
+        <div class="pipe-num">01</div>
+        <div class="pipe-icon">📂</div>
+        <div class="pipe-name">Load Dataset</div>
+      </div>
+      <div class="pipe-step">
+        <div class="pipe-num">02</div>
+        <div class="pipe-icon">🔍</div>
+        <div class="pipe-name">EDA</div>
+      </div>
+      <div class="pipe-step">
+        <div class="pipe-num">03</div>
+        <div class="pipe-icon">⚖️</div>
+        <div class="pipe-name">Feature Scaling</div>
+      </div>
+      <div class="pipe-step">
+        <div class="pipe-num">04</div>
+        <div class="pipe-icon">✂️</div>
+        <div class="pipe-name">Train Test Split</div>
+      </div>
+      <div class="pipe-step">
+        <div class="pipe-num">05</div>
+        <div class="pipe-icon">🎯</div>
+        <div class="pipe-name">Feature Selection</div>
+      </div>
+      <div class="pipe-step">
+        <div class="pipe-num">06</div>
+        <div class="pipe-icon">🏋️</div>
+        <div class="pipe-name">Train Model</div>
+      </div>
+      <div class="pipe-step">
+        <div class="pipe-num">07</div>
+        <div class="pipe-icon">📊</div>
+        <div class="pipe-name">Evaluate</div>
+      </div>
+    </div>
+
+    <!-- Full pipeline code -->
+    <div class="code-wrap">
+      <div class="code-header">
+        <div class="code-left">
+          <div class="code-dots"><span></span><span></span><span></span></div>
+          <div class="code-lang">Steps 1–4 — Load, EDA, Scale, Split</div>
+        </div>
+        <button class="copy-btn" onclick="copyCode(this)">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          Copy
+        </button>
+      </div>
+      <pre data-code><span class="kw">import</span> <span class="imp">pandas</span> <span class="kw">as</span> <span class="var">pd</span>
+<span class="kw">from</span> <span class="imp">sklearn.preprocessing</span> <span class="kw">import</span> <span class="cls">StandardScaler</span>
+<span class="kw">from</span> <span class="imp">sklearn.model_selection</span> <span class="kw">import</span> <span class="fn">train_test_split</span>
+
+<span class="cm"># 1. Load</span>
+<span class="var">df</span> = pd.<span class="fn">read_csv</span>(<span class="str">"your_dataset.csv"</span>)
+
+<span class="cm"># 2. EDA</span>
+<span class="fn">print</span>(<span class="var">df</span>.shape)
+<span class="fn">print</span>(<span class="var">df</span>.isnull().<span class="fn">sum</span>())
+<span class="fn">print</span>(<span class="var">df</span>.describe())
+
+<span class="cm"># 3. Prepare X and y</span>
+<span class="var">X</span> = <span class="var">df</span>.drop(<span class="str">"target"</span>, axis=<span class="num">1</span>)
+<span class="var">y</span> = <span class="var">df</span>[<span class="str">"target"</span>]
+
+<span class="cm"># 4. Feature Scaling (fit on train, transform both)</span>
+<span class="var">scaler</span> = <span class="cls">StandardScaler</span>()
+
+<span class="cm"># 5. Train Test Split</span>
+<span class="var">X_train</span>, <span class="var">X_test</span>, <span class="var">y_train</span>, <span class="var">y_test</span> = <span class="fn">train_test_split</span>(
+    <span class="var">X</span>, <span class="var">y</span>, test_size=<span class="num">0.2</span>, random_state=<span class="num">42</span>
+)
+
+<span class="var">X_train</span> = <span class="var">scaler</span>.<span class="fn">fit_transform</span>(<span class="var">X_train</span>)  <span class="cm"># fit only on train!</span>
+<span class="var">X_test</span>  = <span class="var">scaler</span>.<span class="fn">transform</span>(<span class="var">X_test</span>)</pre>
+    </div>
+
+    <div class="code-wrap">
+      <div class="code-header">
+        <div class="code-left">
+          <div class="code-dots"><span></span><span></span><span></span></div>
+          <div class="code-lang">Steps 5–7 — Train Random Forest + Evaluate</div>
+        </div>
+        <button class="copy-btn" onclick="copyCode(this)">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          Copy
+        </button>
+      </div>
+      <pre data-code><span class="kw">from</span> <span class="imp">sklearn.ensemble</span> <span class="kw">import</span> <span class="cls">RandomForestClassifier</span>
+<span class="kw">from</span> <span class="imp">sklearn.metrics</span> <span class="kw">import</span> <span class="cls">accuracy_score</span>, <span class="cls">confusion_matrix</span>
+
+<span class="cm"># 6. Train Model</span>
+<span class="var">model</span> = <span class="cls">RandomForestClassifier</span>(n_estimators=<span class="num">100</span>, random_state=<span class="num">42</span>)
+<span class="var">model</span>.<span class="fn">fit</span>(<span class="var">X_train</span>, <span class="var">y_train</span>)
+
+<span class="cm"># 7. Evaluate</span>
+<span class="var">y_pred</span> = <span class="var">model</span>.<span class="fn">predict</span>(<span class="var">X_test</span>)
+
+<span class="fn">print</span>(<span class="str">"Accuracy:"</span>, <span class="fn">accuracy_score</span>(<span class="var">y_test</span>, <span class="var">y_pred</span>))
+<span class="fn">print</span>(<span class="str">"Confusion Matrix:\n"</span>, <span class="fn">confusion_matrix</span>(<span class="var">y_test</span>, <span class="var">y_pred</span>))</pre>
+    </div>
+
+    <div class="info-card ic-teal">
+      <div class="ic-eyebrow">Confusion Matrix — What it means</div>
+      <h3>Reading the output</h3>
+      <p>A confusion matrix is a 2×2 grid: <strong>True Positives</strong> (correctly predicted positive), <strong>True Negatives</strong> (correctly predicted negative), <strong>False Positives</strong> (predicted positive, actually negative — Type I error), <strong>False Negatives</strong> (predicted negative, actually positive — Type II error). Accuracy = (TP + TN) / Total.</p>
+    </div>
+
+    <!-- Discussion Q&A -->
+    <div class="qa-heading" style="margin-top:32px;">Discussion Questions — Click to reveal answer</div>
+
+    <div class="qa-item" onclick="toggleQA(this)">
+      <div class="qa-question">
+        <div class="qa-icon">🌲</div>
+        <div class="qa-q-text">Why is <strong>Random Forest</strong> more accurate than a single Decision Tree?</div>
+        <div class="qa-chevron"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+      </div>
+      <div class="qa-answer">
+        <div class="ans-badge">Answer</div>
+        <p>A single Decision Tree is prone to <strong>overfitting</strong> — it memorizes the training data, including noise. Random Forest fixes this by building hundreds of trees, each trained on a different random sample of the data and a random subset of features. When making a prediction, all trees vote and the <strong>majority decision wins</strong>. Individual mistakes cancel each other out. This is called ensemble learning — many weak learners become one strong learner.</p>
+      </div>
+    </div>
+
+    <div class="qa-item" onclick="toggleQA(this)">
+      <div class="qa-question">
+        <div class="qa-icon">⚖️</div>
+        <div class="qa-q-text">Why must we <strong>fit the scaler only on training data</strong> — not on the full dataset?</div>
+        <div class="qa-chevron"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+      </div>
+      <div class="qa-answer">
+        <div class="ans-badge">Answer</div>
+        <p>If you scale using the full dataset before splitting, the scaler learns the <strong>mean and standard deviation of the test data too</strong>. This leaks information about the test set into the training process — called <em>data leakage</em>. In production, your model will never see future data before predicting. The correct approach: <code>fit_transform</code> on training data, then <code>transform</code> only on test data using the training statistics.</p>
+      </div>
+    </div>
+
+    <div class="qa-item" onclick="toggleQA(this)">
+      <div class="qa-question">
+        <div class="qa-icon">📊</div>
+        <div class="qa-q-text">When is <strong>accuracy score not enough</strong> to evaluate a model?</div>
+        <div class="qa-chevron"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+      </div>
+      <div class="qa-answer">
+        <div class="ans-badge">Answer</div>
+        <p>When the dataset is <strong>imbalanced</strong>. Imagine a disease dataset where 95% of people are healthy. A model that always predicts "no disease" gets 95% accuracy — but it misses every sick person. In such cases, use the confusion matrix to check <strong>recall</strong> (did we catch all the sick people?) and <strong>precision</strong> (of those we flagged, how many are actually sick?). For medical, fraud, and safety applications, recall is often more important than raw accuracy.</p>
+      </div>
+    </div>
+
+    <div class="qa-item" onclick="toggleQA(this)">
+      <div class="qa-question">
+        <div class="qa-icon">🔀</div>
+        <div class="qa-q-text">What is the difference between <strong>classification</strong> and <strong>regression</strong>?</div>
+        <div class="qa-chevron"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+      </div>
+      <div class="qa-answer">
+        <div class="ans-badge">Answer</div>
+        <p><strong>Classification</strong> predicts a <em>category/label</em> — spam or not spam, cat or dog, disease or healthy. The output is discrete. <strong>Regression</strong> predicts a <em>continuous number</em> — a house price of ₹45,00,000, a temperature of 36.7°C, a salary of ₹8.5 LPA. A simple test: if you can ask "how much?" → regression. If you can ask "which one?" → classification.</p>
+      </div>
+    </div>
+
+    <div class="qa-item" onclick="toggleQA(this)">
+      <div class="qa-question">
+        <div class="qa-icon">🤖</div>
+        <div class="qa-q-text">When would you choose <strong>SVM over Random Forest</strong>?</div>
+        <div class="qa-chevron"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+      </div>
+      <div class="qa-answer">
+        <div class="ans-badge">Answer</div>
+        <p>SVM shines when: (1) the dataset is <strong>small-to-medium</strong> — Random Forest needs more data to benefit from its ensemble; (2) the data has <strong>many features relative to samples</strong> (e.g. text classification, gene expression data); (3) the classes are <strong>clearly separable</strong> with a margin. Random Forest is better for large tabular datasets with mixed types, missing values, and when you need feature importance scores. For most everyday ML tasks, Random Forest is the safer first choice.</p>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ══════════════ SECTION 4: ASSIGNMENT ══════════════ -->
+  <div class="section">
+    <div class="section-header">
+      <div class="sec-badge b4">Section 04</div>
+      <div class="sec-title">Student Assignment</div>
+    </div>
+
+    <div class="assignment">
+      <div class="asgn-badge">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        Final Assignment
+      </div>
+      <h3>Build a Full ML Pipeline — Train & Compare 2 Models</h3>
+      <p>Choose one dataset below and complete all steps independently. The goal is to compare two different algorithms and explain which performs better and why.</p>
+
+      <div class="asgn-steps">
+        <div class="asgn-step">
+          <div class="asgn-n">01</div>
+          <div class="asgn-txt"><strong>Load the data</strong> — read the CSV, check shape, preview with <code>head()</code></div>
+        </div>
+        <div class="asgn-step">
+          <div class="asgn-n">02</div>
+          <div class="asgn-txt"><strong>Feature Scaling</strong> — apply <code>StandardScaler</code>, fit only on training data</div>
+        </div>
+        <div class="asgn-step">
+          <div class="asgn-n">03</div>
+          <div class="asgn-txt"><strong>Train Test Split</strong> — <code>test_size=0.2</code>, <code>random_state=42</code></div>
+        </div>
+        <div class="asgn-step">
+          <div class="asgn-n">04</div>
+          <div class="asgn-txt"><strong>Feature Selection</strong> — use Random Forest importances, keep top features</div>
+        </div>
+        <div class="asgn-step">
+          <div class="asgn-n">05</div>
+          <div class="asgn-txt"><strong>Train 2 Models</strong> — e.g. <code>RandomForestClassifier</code> + <code>LogisticRegression</code></div>
+        </div>
+        <div class="asgn-step">
+          <div class="asgn-n">06</div>
+          <div class="asgn-txt"><strong>Compare Accuracy</strong> — print <code>accuracy_score</code> and <code>confusion_matrix</code> for both. Which model wins?</div>
+        </div>
+      </div>
+
+      <div class="dataset-row">
+        <div class="dataset-pill"><span>❤️</span> Heart Disease Dataset</div>
+        <div class="dataset-pill"><span>🚢</span> Titanic Dataset</div>
+      </div>
+    </div>
+
+    <!-- Compare template code -->
+    <div class="code-wrap">
+      <div class="code-header">
+        <div class="code-left">
+          <div class="code-dots"><span></span><span></span><span></span></div>
+          <div class="code-lang">Model Comparison Template</div>
+        </div>
+        <button class="copy-btn" onclick="copyCode(this)">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          Copy
+        </button>
+      </div>
+      <pre data-code><span class="kw">from</span> <span class="imp">sklearn.ensemble</span> <span class="kw">import</span> <span class="cls">RandomForestClassifier</span>
+<span class="kw">from</span> <span class="imp">sklearn.linear_model</span> <span class="kw">import</span> <span class="cls">LogisticRegression</span>
+<span class="kw">from</span> <span class="imp">sklearn.metrics</span> <span class="kw">import</span> <span class="cls">accuracy_score</span>, <span class="cls">confusion_matrix</span>
+
+<span class="cm"># ── Model 1: Random Forest ──</span>
+<span class="var">rf</span> = <span class="cls">RandomForestClassifier</span>(n_estimators=<span class="num">100</span>, random_state=<span class="num">42</span>)
+<span class="var">rf</span>.<span class="fn">fit</span>(<span class="var">X_train</span>, <span class="var">y_train</span>)
+<span class="var">rf_pred</span> = <span class="var">rf</span>.<span class="fn">predict</span>(<span class="var">X_test</span>)
+
+<span class="cm"># ── Model 2: Logistic Regression ──</span>
+<span class="var">lr</span> = <span class="cls">LogisticRegression</span>(max_iter=<span class="num">1000</span>, random_state=<span class="num">42</span>)
+<span class="var">lr</span>.<span class="fn">fit</span>(<span class="var">X_train</span>, <span class="var">y_train</span>)
+<span class="var">lr_pred</span> = <span class="var">lr</span>.<span class="fn">predict</span>(<span class="var">X_test</span>)
+
+<span class="cm"># ── Compare ──</span>
+<span class="fn">print</span>(<span class="str">"Random Forest Accuracy :"</span>, <span class="fn">accuracy_score</span>(<span class="var">y_test</span>, <span class="var">rf_pred</span>))
+<span class="fn">print</span>(<span class="str">"Logistic Regression Acc:"</span>, <span class="fn">accuracy_score</span>(<span class="var">y_test</span>, <span class="var">lr_pred</span>))
+
+<span class="fn">print</span>(<span class="str">"\nRF Confusion Matrix:\n"</span>,   <span class="fn">confusion_matrix</span>(<span class="var">y_test</span>, <span class="var">rf_pred</span>))
+<span class="fn">print</span>(<span class="str">"\nLR Confusion Matrix:\n"</span>,   <span class="fn">confusion_matrix</span>(<span class="var">y_test</span>, <span class="var">lr_pred</span>))</pre>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+// Animate on load
+window.addEventListener('load', () => {
+  document.querySelectorAll('.algo-card, .lib-card, .step-row').forEach((el, i) => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(12px)';
+    setTimeout(() => {
+      el.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+      el.style.opacity = '1';
+      el.style.transform = 'translateY(0)';
+    }, 80 + i * 40);
+  });
+});
+
+// Copy code
+function copyCode(btn) {
+  const pre = btn.closest('.code-wrap').querySelector('pre[data-code]');
+  navigator.clipboard.writeText(pre.innerText).then(() => {
+    btn.classList.add('copied');
+    btn.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Copied!`;
+    setTimeout(() => {
+      btn.classList.remove('copied');
+      btn.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy`;
+    }, 2000);
+  });
+}
+
+// Q&A accordion
+function toggleQA(item) {
+  const isOpen = item.classList.contains('open');
+  document.querySelectorAll('.qa-item.open').forEach(i => i.classList.remove('open'));
+  if (!isOpen) item.classList.add('open');
+}
+</script>
+</body>
+</html>

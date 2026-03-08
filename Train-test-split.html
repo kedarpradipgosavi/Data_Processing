@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 2 — Train Test Split</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0b0e14;
+    --surface: #111520;
+    --card: #161c2a;
+    --border: #1e2840;
+    --accent: #4fffb0;
+    --accent2: #ff6b6b;
+    --accent3: #ffd166;
+    --accent4: #74b9ff;
+    --text: #e8eaf0;
+    --muted: #6b7694;
+    --code-bg: #0d1117;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Grid lines background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(78,255,176,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(78,255,176,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 48px 24px 80px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* HEADER */
+  .header {
+    margin-bottom: 56px;
+    animation: fadeUp 0.6s ease both;
+  }
+
+  .day-badge {
+    display: inline-block;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: var(--accent);
+    background: rgba(78,255,176,0.08);
+    border: 1px solid rgba(78,255,176,0.2);
+    padding: 6px 14px;
+    border-radius: 2px;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+  }
+
+  h1 {
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    color: #fff;
+  }
+
+  h1 span {
+    color: var(--accent);
+    position: relative;
+  }
+
+  .subtitle {
+    margin-top: 14px;
+    color: var(--muted);
+    font-size: 1.05rem;
+    font-weight: 400;
+  }
+
+  .header-line {
+    height: 1px;
+    background: linear-gradient(90deg, var(--accent), transparent);
+    margin-top: 32px;
+    opacity: 0.4;
+  }
+
+  /* HOUR BLOCKS */
+  .hour-block {
+    margin-bottom: 40px;
+    animation: fadeUp 0.6s ease both;
+  }
+  .hour-block:nth-child(2) { animation-delay: 0.1s; }
+  .hour-block:nth-child(3) { animation-delay: 0.2s; }
+  .hour-block:nth-child(4) { animation-delay: 0.3s; }
+
+  .hour-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 24px;
+  }
+
+  .hour-pill {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 5px 12px;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+  .hour-pill.h1 { background: rgba(255,107,107,0.12); color: var(--accent2); border: 1px solid rgba(255,107,107,0.25); }
+  .hour-pill.h2 { background: rgba(116,185,255,0.12); color: var(--accent4); border: 1px solid rgba(116,185,255,0.25); }
+  .hour-pill.h3 { background: rgba(255,209,102,0.12); color: var(--accent3); border: 1px solid rgba(255,209,102,0.25); }
+
+  .hour-title {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: #fff;
+  }
+
+  /* CARD */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 28px 32px;
+    margin-bottom: 16px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px; height: 100%;
+  }
+  .card.red::before { background: var(--accent2); }
+  .card.blue::before { background: var(--accent4); }
+  .card.yellow::before { background: var(--accent3); }
+  .card.green::before { background: var(--accent); }
+
+  .card-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin-bottom: 12px;
+    color: var(--muted);
+  }
+
+  .card h3 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: #fff;
+  }
+
+  .card p {
+    color: #b0b8d0;
+    line-height: 1.7;
+    font-size: 0.95rem;
+    font-weight: 400;
+  }
+
+  /* CONCEPT GRID */
+  .concept-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  @media (max-width: 560px) { .concept-grid { grid-template-columns: 1fr; } }
+
+  .concept-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 20px 22px;
+    position: relative;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+
+  .concept-card:hover {
+    border-color: rgba(78,255,176,0.3);
+    transform: translateY(-2px);
+  }
+
+  .concept-icon {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+  }
+
+  .concept-card h4 {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 6px;
+  }
+
+  .concept-card p {
+    font-size: 0.82rem;
+    color: var(--muted);
+    line-height: 1.6;
+    font-weight: 400;
+  }
+
+  /* RATIO VIZ */
+  .ratio-viz {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 28px 32px;
+    margin-bottom: 16px;
+  }
+
+  .ratio-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--muted);
+    margin-bottom: 20px;
+  }
+
+  .ratio-bar-wrap {
+    display: flex;
+    border-radius: 4px;
+    overflow: hidden;
+    height: 52px;
+    margin-bottom: 16px;
+  }
+
+  .ratio-train {
+    width: 80%;
+    background: linear-gradient(90deg, rgba(78,255,176,0.3), rgba(78,255,176,0.15));
+    border-right: 2px solid rgba(78,255,176,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 700;
+    transition: all 0.3s;
+  }
+
+  .ratio-test {
+    width: 20%;
+    background: linear-gradient(90deg, rgba(255,107,107,0.15), rgba(255,107,107,0.3));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.85rem;
+    color: var(--accent2);
+    font-weight: 700;
+  }
+
+  .ratio-legend {
+    display: flex;
+    gap: 24px;
+  }
+
+  .ratio-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.82rem;
+    color: var(--muted);
+    font-weight: 400;
+  }
+
+  .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+  }
+
+  /* CODE BLOCK */
+  .code-wrap {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+
+  .code-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    background: rgba(255,255,255,0.03);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .code-lang {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .code-dots { display: flex; gap: 6px; }
+  .code-dots span {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+  }
+  .code-dots span:nth-child(1) { background: #ff5f57; }
+  .code-dots span:nth-child(2) { background: #febc2e; }
+  .code-dots span:nth-child(3) { background: #28c840; }
+
+  pre {
+    padding: 20px 22px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.82rem;
+    line-height: 1.8;
+    overflow-x: auto;
+    color: #c9d1d9;
+  }
+
+  .kw { color: #ff79c6; }
+  .fn { color: #50fa7b; }
+  .str { color: #f1fa8c; }
+  .cm { color: #6272a4; font-style: italic; }
+  .var { color: #8be9fd; }
+  .num { color: #bd93f9; }
+  .imp { color: #ff9580; }
+
+  /* PARAM TABLE */
+  .param-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+    margin-bottom: 0;
+  }
+
+  .param-table th {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-align: left;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    font-weight: 400;
+  }
+
+  .param-table td {
+    padding: 12px 14px;
+    border-bottom: 1px solid rgba(30,40,64,0.5);
+    vertical-align: top;
+    color: #b0b8d0;
+    line-height: 1.6;
+    font-weight: 400;
+  }
+
+  .param-table tr:last-child td { border-bottom: none; }
+
+  .param-name {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--accent4);
+  }
+
+  .param-type {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--accent3);
+    background: rgba(255,209,102,0.08);
+    padding: 2px 7px;
+    border-radius: 3px;
+  }
+
+  /* EXERCISE STEPS */
+  .steps {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .step-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 18px 22px;
+    transition: border-color 0.2s;
+  }
+
+  .step-item:hover { border-color: rgba(255,209,102,0.3); }
+
+  .step-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--accent3);
+    min-width: 32px;
+    line-height: 1;
+    padding-top: 2px;
+  }
+
+  .step-content h4 {
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 4px;
+  }
+
+  .step-content p {
+    font-size: 0.82rem;
+    color: var(--muted);
+    line-height: 1.6;
+    font-weight: 400;
+  }
+
+  /* DATASET CARDS */
+  .dataset-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+
+  @media (max-width: 560px) { .dataset-grid { grid-template-columns: 1fr; } }
+
+  .dataset-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 22px 20px;
+    text-align: center;
+    transition: border-color 0.2s, transform 0.2s;
+    cursor: default;
+  }
+
+  .dataset-card:hover {
+    border-color: rgba(78,255,176,0.35);
+    transform: translateY(-3px);
+  }
+
+  .dataset-emoji { font-size: 2rem; margin-bottom: 10px; }
+
+  .dataset-card h4 {
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 6px;
+  }
+
+  .dataset-card p {
+    font-size: 0.78rem;
+    color: var(--muted);
+    line-height: 1.5;
+    font-weight: 400;
+  }
+
+  .dataset-tag {
+    display: inline-block;
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 2px;
+    margin-top: 10px;
+  }
+  .tag-class { background: rgba(116,185,255,0.12); color: var(--accent4); }
+  .tag-reg  { background: rgba(78,255,176,0.10); color: var(--accent); }
+
+  /* DIVIDER */
+  .section-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 40px 0;
+  }
+
+  /* INLINE TAG */
+  code {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.8em;
+    background: rgba(78,255,176,0.08);
+    color: var(--accent);
+    padding: 2px 7px;
+    border-radius: 3px;
+  }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* INTERACTIVE SPLIT SLIDER */
+  .split-demo {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 24px 28px;
+    margin-bottom: 16px;
+  }
+
+  .split-demo label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    display: block;
+    margin-bottom: 14px;
+  }
+
+  .slider-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 16px;
+  }
+
+  input[type=range] {
+    flex: 1;
+    -webkit-appearance: none;
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    outline: none;
+  }
+
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px; height: 18px;
+    background: var(--accent);
+    border-radius: 50%;
+    cursor: pointer;
+  }
+
+  .slider-val {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.9rem;
+    color: var(--accent);
+    min-width: 40px;
+    text-align: right;
+  }
+
+  .live-bar-wrap {
+    display: flex;
+    border-radius: 4px;
+    overflow: hidden;
+    height: 44px;
+    transition: all 0.2s;
+  }
+
+  .live-train {
+    background: linear-gradient(90deg, rgba(78,255,176,0.3), rgba(78,255,176,0.15));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--accent);
+    font-weight: 700;
+    transition: width 0.2s;
+    border-right: 2px solid rgba(78,255,176,0.4);
+  }
+
+  .live-test {
+    background: linear-gradient(90deg, rgba(255,107,107,0.15), rgba(255,107,107,0.3));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--accent2);
+    font-weight: 700;
+    flex: 1;
+    transition: width 0.2s;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="day-badge">ML Bootcamp &nbsp;/&nbsp; Day 02</div>
+    <h1>Train <span>&</span> Test Split</h1>
+    <p class="subtitle">Why we split data, how to do it, and hands-on practice</p>
+    <div class="header-line"></div>
+  </div>
+
+
+  <!-- ══════════════════ HOUR 1 ══════════════════ -->
+  <div class="hour-block">
+    <div class="hour-header">
+      <div class="hour-pill h1">Hour 1</div>
+      <div class="hour-title">Concepts</div>
+    </div>
+
+    <!-- Problem statement -->
+    <div class="card red">
+      <div class="card-label">The Core Problem</div>
+      <h3>Model Memorization</h3>
+      <p>A model that trains and tests on the <em>same</em> data is like a student who memorizes an answer key — they score 100% on that test, but fail every new question. This is <strong>overfitting</strong>. We split data so we can measure how well the model <strong>generalizes</strong> to unseen examples.</p>
+    </div>
+
+    <!-- 4 Concepts -->
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="concept-icon">🏋️</div>
+        <h4>Training Data</h4>
+        <p>The subset the model learns from. Parameters are tuned exclusively against this data.</p>
+      </div>
+      <div class="concept-card">
+        <div class="concept-icon">🧪</div>
+        <h4>Testing Data</h4>
+        <p>Held-out data the model never sees during training. Used only to evaluate final performance.</p>
+      </div>
+      <div class="concept-card">
+        <div class="concept-icon">📌</div>
+        <h4>Overfitting</h4>
+        <p>Model performs great on training data but poorly on new data — it memorized noise, not patterns.</p>
+      </div>
+      <div class="concept-card">
+        <div class="concept-icon">🌍</div>
+        <h4>Generalization</h4>
+        <p>The model's ability to make accurate predictions on data it has never encountered before.</p>
+      </div>
+    </div>
+
+    <!-- Ratio viz + interactive -->
+    <div class="ratio-viz">
+      <div class="ratio-label">Standard Split Ratio</div>
+      <div class="ratio-bar-wrap">
+        <div class="ratio-train">80% Train</div>
+        <div class="ratio-test">20% Test</div>
+      </div>
+      <div class="ratio-legend">
+        <div class="ratio-legend-item"><div class="dot" style="background:var(--accent)"></div>Training — model learns here</div>
+        <div class="ratio-legend-item"><div class="dot" style="background:var(--accent2)"></div>Testing — evaluation only</div>
+      </div>
+    </div>
+
+    <!-- Interactive demo -->
+    <div class="split-demo">
+      <label>Interactive — Drag to explore different splits</label>
+      <div class="slider-row">
+        <input type="range" min="50" max="95" value="80" id="splitSlider">
+        <span class="slider-val" id="sliderVal">80%</span>
+      </div>
+      <div class="live-bar-wrap">
+        <div class="live-train" id="liveTrain" style="width:80%">80% Train</div>
+        <div class="live-test" id="liveTest">20% Test</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- ══════════════════ HOUR 2 ══════════════════ -->
+  <div class="hour-block">
+    <div class="hour-header">
+      <div class="hour-pill h2">Hour 2</div>
+      <div class="hour-title">Practical — sklearn</div>
+    </div>
+
+    <!-- Import -->
+    <div class="code-wrap">
+      <div class="code-header">
+        <div class="code-dots"><span></span><span></span><span></span></div>
+        <div class="code-lang">Python — Import</div>
+      </div>
+      <pre><span class="kw">from</span> <span class="imp">sklearn.model_selection</span> <span class="kw">import</span> <span class="fn">train_test_split</span></pre>
+    </div>
+
+    <!-- Main example -->
+    <div class="code-wrap">
+      <div class="code-header">
+        <div class="code-dots"><span></span><span></span><span></span></div>
+        <div class="code-lang">Python — Usage</div>
+      </div>
+      <pre><span class="cm"># X = features, y = labels</span>
+<span class="var">X_train</span>, <span class="var">X_test</span>, <span class="var">y_train</span>, <span class="var">y_test</span> = <span class="fn">train_test_split</span>(
+    <span class="var">X</span>, <span class="var">y</span>,
+    test_size=<span class="num">0.2</span>,         <span class="cm"># 20% goes to test set</span>
+    random_state=<span class="num">42</span>       <span class="cm"># seed for reproducibility</span>
+)</pre>
+    </div>
+
+    <!-- Parameter explanation table -->
+    <div class="card blue" style="padding:0; overflow:hidden;">
+      <div style="padding: 18px 22px 10px; border-bottom: 1px solid var(--border);">
+        <div class="card-label">Parameter Reference</div>
+      </div>
+      <table class="param-table">
+        <thead>
+          <tr>
+            <th>Parameter</th>
+            <th>Type</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="param-name">X, y</span></td>
+            <td><span class="param-type">array-like</span></td>
+            <td>Features matrix and labels. Must have the same number of rows.</td>
+          </tr>
+          <tr>
+            <td><span class="param-name">test_size</span></td>
+            <td><span class="param-type">float</span></td>
+            <td>Fraction of data for the test set. <code>0.2</code> = 20%. Default is <code>0.25</code>.</td>
+          </tr>
+          <tr>
+            <td><span class="param-name">random_state</span></td>
+            <td><span class="param-type">int</span></td>
+            <td>Seeds the random number generator so the same shuffle happens every run. Any integer works; <code>42</code> is conventional.</td>
+          </tr>
+          <tr>
+            <td><span class="param-name">shuffle</span></td>
+            <td><span class="param-type">bool</span></td>
+            <td>Whether to shuffle before splitting. Defaults to <code>True</code> — almost always leave it on.</td>
+          </tr>
+          <tr>
+            <td><span class="param-name">stratify</span></td>
+            <td><span class="param-type">array-like</span></td>
+            <td>Pass <code>y</code> here to preserve class proportions in both sets. Important for imbalanced datasets.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Reproducibility note -->
+    <div class="card blue">
+      <div class="card-label">Why random_state matters</div>
+      <h3>Reproducibility</h3>
+      <p>Without a fixed <code>random_state</code>, every run shuffles the data differently — giving you different splits, different results, and results that can't be compared or verified by others. Setting it to any integer (e.g. <code>42</code>) locks the shuffle so your experiment is repeatable by anyone who runs the same code.</p>
+    </div>
+
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- ══════════════════ HOUR 3 ══════════════════ -->
+  <div class="hour-block">
+    <div class="hour-header">
+      <div class="hour-pill h3">Hour 3</div>
+      <div class="hour-title">Exercise</div>
+    </div>
+
+    <!-- Steps -->
+    <div class="steps">
+      <div class="step-item">
+        <div class="step-num">01</div>
+        <div class="step-content">
+          <h4>Load Dataset</h4>
+          <p>Pick one of the suggested datasets below. Load it using <code>pandas</code> or <code>sklearn.datasets</code> and inspect the shape, columns, and data types.</p>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">02</div>
+        <div class="step-content">
+          <h4>Exploratory Data Analysis (EDA)</h4>
+          <p>Check for missing values, look at distributions, identify the target column, and examine correlations between features.</p>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">03</div>
+        <div class="step-content">
+          <h4>Feature Scaling</h4>
+          <p>Apply <code>StandardScaler</code> or <code>MinMaxScaler</code> to numeric features — fit on training data only, then transform both sets.</p>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">04</div>
+        <div class="step-content">
+          <h4>Train Test Split</h4>
+          <p>Use <code>train_test_split</code> with <code>test_size=0.2</code> and <code>random_state=42</code>. Print the shapes of all four resulting arrays.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dataset suggestions -->
+    <div class="card yellow">
+      <div class="card-label">Suggested Datasets</div>
+    </div>
+    <div class="dataset-grid">
+      <div class="dataset-card">
+        <div class="dataset-emoji">🚢</div>
+        <h4>Titanic</h4>
+        <p>Predict passenger survival. Classic binary classification with mixed data types.</p>
+        <div class="dataset-tag tag-class">Classification</div>
+      </div>
+      <div class="dataset-card">
+        <div class="dataset-emoji">🏠</div>
+        <h4>Housing</h4>
+        <p>Predict median house prices from neighborhood features. Great for regression.</p>
+        <div class="dataset-tag tag-reg">Regression</div>
+      </div>
+      <div class="dataset-card">
+        <div class="dataset-emoji">💉</div>
+        <h4>Diabetes</h4>
+        <p>Predict diabetes progression. Clean numeric data — perfect for scaling practice.</p>
+        <div class="dataset-tag tag-reg">Regression</div>
+      </div>
+    </div>
+
+    <!-- Starter code -->
+    <div style="margin-top:16px;">
+      <div class="code-wrap">
+        <div class="code-header">
+          <div class="code-dots"><span></span><span></span><span></span></div>
+          <div class="code-lang">Python — Exercise Starter</div>
+        </div>
+        <pre><span class="kw">import</span> <span class="imp">pandas</span> <span class="kw">as</span> <span class="var">pd</span>
+<span class="kw">from</span> <span class="imp">sklearn.model_selection</span> <span class="kw">import</span> <span class="fn">train_test_split</span>
+<span class="kw">from</span> <span class="imp">sklearn.preprocessing</span> <span class="kw">import</span> <span class="fn">StandardScaler</span>
+
+<span class="cm"># 1. Load</span>
+<span class="var">df</span> = pd.<span class="fn">read_csv</span>(<span class="str">"your_dataset.csv"</span>)
+
+<span class="cm"># 2. EDA</span>
+<span class="fn">print</span>(<span class="var">df</span>.shape)
+<span class="fn">print</span>(<span class="var">df</span>.isnull().<span class="fn">sum</span>())
+<span class="fn">print</span>(<span class="var">df</span>.describe())
+
+<span class="cm"># 3. Prepare features and target</span>
+<span class="var">X</span> = <span class="var">df</span>.drop(<span class="str">"target"</span>, axis=<span class="num">1</span>)
+<span class="var">y</span> = <span class="var">df</span>[<span class="str">"target"</span>]
+
+<span class="cm"># 4. Scale</span>
+<span class="var">scaler</span> = <span class="fn">StandardScaler</span>()
+<span class="var">X_scaled</span> = <span class="var">scaler</span>.<span class="fn">fit_transform</span>(<span class="var">X</span>)
+
+<span class="cm"># 5. Split</span>
+<span class="var">X_train</span>, <span class="var">X_test</span>, <span class="var">y_train</span>, <span class="var">y_test</span> = <span class="fn">train_test_split</span>(
+    <span class="var">X_scaled</span>, <span class="var">y</span>, test_size=<span class="num">0.2</span>, random_state=<span class="num">42</span>
+)
+
+<span class="fn">print</span>(<span class="str">f"Train: </span><span class="var">{X_train.shape}</span><span class="str"> | Test: </span><span class="var">{X_test.shape}</span><span class="str">"</span>)</pre>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+  const slider = document.getElementById('splitSlider');
+  const valLabel = document.getElementById('sliderVal');
+  const liveTrain = document.getElementById('liveTrain');
+  const liveTest = document.getElementById('liveTest');
+
+  slider.addEventListener('input', () => {
+    const train = slider.value;
+    const test = 100 - train;
+    valLabel.textContent = train + '%';
+    liveTrain.style.width = train + '%';
+    liveTrain.textContent = train + '% Train';
+    liveTest.textContent = test + '% Test';
+  });
+</script>
+</body>
+</html>
