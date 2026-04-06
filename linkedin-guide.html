@@ -1,0 +1,1195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LinkedIn Mastery — B.Tech Freshers Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0a0f;
+  --surface: #111118;
+  --surface2: #1a1a24;
+  --border: #2a2a38;
+  --accent: #4f8cff;
+  --accent2: #a78bfa;
+  --accent3: #34d399;
+  --accent4: #fb923c;
+  --text: #e8e8f0;
+  --text-muted: #8888a0;
+  --li-blue: #0a66c2;
+  --gold: #fbbf24;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  line-height: 1.7;
+  overflow-x: hidden;
+}
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 2px; }
+
+/* PROGRESS BAR */
+#progressBar {
+  position: fixed; top:0; left:0; height:3px;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  z-index: 300; width:0%; transition: width 0.1s;
+}
+
+/* NAV */
+nav {
+  position: fixed; top:0; left:0; right:0; z-index:200;
+  padding: 14px 40px;
+  display:flex; align-items:center; justify-content:space-between;
+  background: rgba(10,10,15,0.92);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+}
+.nav-logo {
+  font-family:'Syne',sans-serif; font-weight:800; font-size:18px;
+  color:var(--accent); display:flex; align-items:center; gap:8px;
+}
+.nav-logo .li-badge {
+  background:var(--li-blue); color:#fff;
+  padding:2px 8px; border-radius:4px; font-size:13px;
+}
+.nav-links { display:flex; gap:4px; list-style:none; }
+.nav-links a {
+  color:var(--text-muted); text-decoration:none; font-size:13px;
+  padding:6px 12px; border-radius:6px; transition:all 0.2s; font-weight:500;
+}
+.nav-links a:hover { color:var(--text); background:var(--surface2); }
+
+/* HERO */
+.hero {
+  min-height:100vh; display:flex; flex-direction:column;
+  justify-content:center; align-items:center; text-align:center;
+  padding:120px 40px 80px; position:relative; overflow:hidden;
+}
+.hero-bg {
+  position:absolute; inset:0; pointer-events:none;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% 20%, rgba(79,140,255,0.13) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 30% at 80% 80%, rgba(167,139,250,0.08) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 30% at 20% 70%, rgba(52,211,153,0.06) 0%, transparent 60%);
+}
+.hero-badge {
+  display:inline-flex; align-items:center; gap:8px;
+  background:rgba(79,140,255,0.12); border:1px solid rgba(79,140,255,0.3);
+  color:var(--accent); padding:6px 18px; border-radius:100px;
+  font-size:12px; font-weight:700; letter-spacing:1px; text-transform:uppercase;
+  margin-bottom:28px;
+  animation: fadeUp 0.5s ease both;
+}
+.hero-badge .dot {
+  width:6px; height:6px; border-radius:50%; background:var(--accent);
+  animation: pulse 2s infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(1.5)} }
+.hero h1 {
+  font-family:'Syne',sans-serif;
+  font-size: clamp(44px,8vw,86px);
+  font-weight:800; line-height:1.0; letter-spacing:-3px;
+  margin-bottom:22px;
+  animation: fadeUp 0.5s 0.1s ease both;
+}
+.hero h1 .grad {
+  background: linear-gradient(135deg, var(--accent), var(--accent2) 50%, var(--accent3));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+}
+.hero p {
+  font-size:18px; color:var(--text-muted); max-width:520px;
+  margin-bottom:36px; font-weight:300;
+  animation: fadeUp 0.5s 0.2s ease both;
+}
+.hero-stats {
+  display:flex; gap:48px; margin-bottom:44px;
+  animation: fadeUp 0.5s 0.3s ease both;
+}
+.stat-num { font-family:'Syne',sans-serif; font-size:30px; font-weight:800; color:var(--accent); display:block; }
+.stat-label { font-size:12px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.8px; }
+.hero-cta { display:flex; gap:12px; animation: fadeUp 0.5s 0.4s ease both; flex-wrap:wrap; justify-content:center; }
+@keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+
+/* BUTTONS */
+.btn-primary {
+  background:var(--accent); color:#fff; border:none;
+  padding:13px 26px; border-radius:10px; font-size:14px; font-weight:600;
+  cursor:pointer; transition:all 0.2s; text-decoration:none;
+  display:inline-flex; align-items:center; gap:8px; font-family:inherit;
+}
+.btn-primary:hover { background:#3a7af0; transform:translateY(-2px); box-shadow:0 8px 24px rgba(79,140,255,0.3); }
+.btn-secondary {
+  background:transparent; color:var(--text); border:1px solid var(--border);
+  padding:13px 26px; border-radius:10px; font-size:14px; font-weight:500;
+  cursor:pointer; transition:all 0.2s; text-decoration:none; font-family:inherit;
+}
+.btn-secondary:hover { border-color:var(--accent); color:var(--accent); }
+
+/* LAYOUT */
+.section-wrap { padding:90px 40px; max-width:1100px; margin:0 auto; }
+.divider { width:100%; height:1px; background:linear-gradient(90deg,transparent,var(--border),transparent); }
+.section-label {
+  display:inline-flex; align-items:center; gap:8px;
+  color:var(--accent); font-size:11px; font-weight:700;
+  text-transform:uppercase; letter-spacing:2px; margin-bottom:14px;
+}
+.section-label::before { content:''; width:20px; height:2px; background:var(--accent); }
+.section-title {
+  font-family:'Syne',sans-serif;
+  font-size:clamp(26px,4vw,42px); font-weight:800;
+  letter-spacing:-1.5px; line-height:1.1; margin-bottom:14px;
+}
+.section-sub { color:var(--text-muted); font-size:16px; max-width:520px; margin-bottom:52px; }
+
+/* TWO COL */
+.two-col { display:grid; grid-template-columns:1fr 1fr; gap:36px; align-items:start; }
+@media(max-width:768px){ .two-col{grid-template-columns:1fr;} }
+
+/* PROFILE MOCKUP */
+.profile-mockup {
+  background:var(--surface2); border:1px solid var(--border);
+  border-radius:14px; overflow:hidden;
+}
+.mockup-topbar {
+  background:#0a66c2; padding:10px 18px;
+  display:flex; align-items:center; gap:10px; font-size:14px; font-weight:700; color:#fff;
+}
+.profile-cover {
+  height:110px;
+  background:linear-gradient(135deg,#1e3a5f 0%,#0a66c2 50%,#1e4a8f 100%);
+  position:relative;
+}
+.profile-avatar {
+  width:84px; height:84px; border-radius:50%;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  border:4px solid var(--surface2);
+  position:absolute; bottom:-42px; left:22px;
+  display:flex; align-items:center; justify-content:center; font-size:30px;
+}
+.profile-info { padding:52px 22px 22px; }
+.profile-name { font-family:'Syne',sans-serif; font-size:21px; font-weight:800; margin-bottom:4px; }
+.profile-headline { color:var(--text-muted); font-size:14px; margin-bottom:8px; line-height:1.5; }
+.profile-meta { display:flex; gap:14px; font-size:12px; color:#6888bb; flex-wrap:wrap; }
+
+/* SSI METER */
+.ssi-meter {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:16px; padding:28px;
+}
+.ssi-meter h3 { font-family:'Syne',sans-serif; font-size:19px; font-weight:700; margin-bottom:8px; letter-spacing:-0.5px; }
+.ssi-bars { display:grid; gap:14px; margin-top:20px; }
+.ssi-bar-item { display:grid; gap:5px; }
+.ssi-bar-label { display:flex; justify-content:space-between; font-size:13px; }
+.ssi-bar-label span:first-child { color:var(--text); font-weight:500; }
+.ssi-bar-label span:last-child { color:var(--text-muted); font-size:12px; }
+.ssi-bar-track { background:var(--surface2); border-radius:4px; height:8px; overflow:hidden; }
+.ssi-bar-fill { height:100%; border-radius:4px; width:0%; transition:width 1.2s cubic-bezier(0.4,0,0.2,1); }
+
+/* STEPS */
+.steps-grid { display:grid; gap:16px; }
+.step-card {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:14px; padding:28px; position:relative;
+  cursor:pointer; transition:border-color 0.2s, box-shadow 0.2s;
+  overflow:hidden;
+}
+.step-card:hover { border-color:rgba(79,140,255,0.35); box-shadow:0 8px 32px rgba(0,0,0,0.35); }
+.step-card.active { border-color:rgba(79,140,255,0.5); box-shadow:0 0 0 1px rgba(79,140,255,0.15), 0 12px 40px rgba(0,0,0,0.4); }
+.step-header { display:flex; align-items:center; gap:18px; }
+.step-icon {
+  width:50px; height:50px; border-radius:13px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:24px; flex-shrink:0;
+}
+.step-meta { flex:1; }
+.step-meta h3 { font-family:'Syne',sans-serif; font-size:18px; font-weight:700; letter-spacing:-0.3px; margin-bottom:2px; }
+.step-meta p { color:var(--text-muted); font-size:13px; }
+.step-toggle {
+  width:30px; height:30px; border-radius:8px;
+  background:var(--surface2); border:1px solid var(--border);
+  display:flex; align-items:center; justify-content:center;
+  transition:all 0.25s; flex-shrink:0;
+  font-size:20px; font-weight:300; color:var(--text-muted); line-height:1;
+  user-select:none;
+}
+.step-card.active .step-toggle { background:var(--accent); border-color:var(--accent); color:#fff; transform:rotate(45deg); }
+.step-body {
+  display:none; padding-top:22px; margin-top:22px;
+  border-top:1px solid var(--border);
+}
+.step-card.active .step-body { display:block; animation:expandIn 0.25s ease; }
+@keyframes expandIn { from{opacity:0;transform:translateY(-6px)} to{opacity:1;transform:translateY(0)} }
+
+/* TIPS */
+.tip-list { list-style:none; display:grid; gap:10px; margin-bottom:16px; }
+.tip-list li { display:flex; align-items:flex-start; gap:10px; font-size:14px; line-height:1.6; }
+.tip-list li::before { content:'→'; color:var(--accent); font-weight:700; flex-shrink:0; margin-top:1px; }
+.tip-list li strong { color:var(--text); font-weight:600; }
+
+/* BOXES */
+.example-box {
+  background:var(--surface2); border:1px solid var(--border);
+  border-left:3px solid var(--accent3);
+  border-radius:0 10px 10px 0; padding:18px; margin:14px 0;
+  font-size:13px; color:var(--text-muted); line-height:1.7;
+}
+.example-box strong {
+  color:var(--accent3); font-style:normal; font-size:11px;
+  text-transform:uppercase; letter-spacing:1px; display:block; margin-bottom:6px;
+}
+.example-box em { color:var(--text); font-style:normal; font-weight:400; }
+.pro-tip {
+  background:rgba(79,140,255,0.07); border:1px solid rgba(79,140,255,0.2);
+  border-radius:10px; padding:14px 18px; margin:14px 0;
+  font-size:13px; display:flex; gap:10px; align-items:flex-start;
+}
+.pro-tip p { color:var(--text-muted); line-height:1.6; }
+.pro-tip strong { color:var(--accent); }
+.warning-box {
+  background:rgba(251,146,60,0.07); border:1px solid rgba(251,146,60,0.22);
+  border-radius:10px; padding:14px 18px; margin:14px 0;
+  font-size:13px; display:flex; gap:10px; align-items:flex-start;
+}
+.warning-box p { color:var(--text-muted); line-height:1.6; }
+.warning-box strong { color:var(--accent4); }
+.tip-icon { font-size:17px; flex-shrink:0; }
+
+/* TABLE */
+.comp-table { width:100%; border-collapse:collapse; font-size:13px; margin:18px 0; }
+.comp-table th {
+  background:var(--surface2); padding:10px 14px; text-align:left;
+  font-family:'Syne',sans-serif; font-weight:700; font-size:11px;
+  text-transform:uppercase; letter-spacing:0.8px; color:var(--text-muted);
+  border-bottom:1px solid var(--border);
+}
+.comp-table td {
+  padding:10px 14px; border-bottom:1px solid rgba(255,255,255,0.04);
+  color:var(--text-muted); vertical-align:top; line-height:1.5;
+}
+.comp-table tr:hover td { background:rgba(255,255,255,0.02); }
+.comp-table td:first-child { color:var(--text); font-weight:500; }
+.comp-table .good { color:var(--accent3); }
+.comp-table .bad { color:#ef4444; }
+
+/* TAGS */
+.tag-cloud { display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; }
+.tag {
+  background:rgba(79,140,255,0.1); border:1px solid rgba(79,140,255,0.2);
+  color:var(--accent); padding:5px 12px; border-radius:100px;
+  font-size:12px; font-weight:600; cursor:pointer; transition:all 0.2s;
+}
+.tag:hover { background:var(--accent); color:#fff; border-color:var(--accent); }
+
+/* TIMELINE */
+.timeline { position:relative; padding-left:28px; margin-top:24px; }
+.timeline::before {
+  content:''; position:absolute; left:6px; top:8px; bottom:8px;
+  width:2px; background:linear-gradient(180deg,var(--accent),var(--accent2),transparent);
+}
+.timeline-item { position:relative; padding-bottom:28px; }
+.timeline-item:last-child { padding-bottom:0; }
+.timeline-item::before {
+  content:''; position:absolute; left:-24px; top:6px;
+  width:10px; height:10px; border-radius:50%; background:var(--accent); border:2px solid var(--bg);
+}
+.timeline-item h4 { font-family:'Syne',sans-serif; font-weight:700; font-size:14px; margin-bottom:3px; }
+.timeline-item p { font-size:13px; color:var(--text-muted); line-height:1.6; }
+.timeline-time {
+  display:inline-block; background:var(--surface2); border:1px solid var(--border);
+  color:var(--text-muted); font-size:11px; padding:2px 10px;
+  border-radius:100px; margin-bottom:6px; font-weight:600;
+}
+
+/* COLOR VARIANTS */
+.c-blue { background:rgba(79,140,255,0.15); }
+.c-purple { background:rgba(167,139,250,0.15); }
+.c-green { background:rgba(52,211,153,0.15); }
+.c-orange { background:rgba(251,146,60,0.15); }
+.c-gold { background:rgba(251,191,36,0.15); }
+
+/* CHECKLIST */
+.checklist-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(270px,1fr)); gap:16px; }
+.checklist-card { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:20px; }
+.checklist-card h4 { font-family:'Syne',sans-serif; font-size:15px; font-weight:700; margin-bottom:12px; display:flex; align-items:center; gap:8px; }
+.check-item {
+  display:flex; align-items:center; gap:10px;
+  padding:9px 0; border-bottom:1px solid rgba(255,255,255,0.04);
+  cursor:pointer; font-size:13px; transition:color 0.2s; user-select:none;
+}
+.check-item:last-of-type { border-bottom:none; }
+.check-item:hover { color:var(--accent); }
+.checkbox {
+  width:18px; height:18px; border:2px solid var(--border); border-radius:5px;
+  flex-shrink:0; transition:all 0.2s; display:flex; align-items:center;
+  justify-content:center; font-size:11px; font-weight:700;
+}
+.check-item.checked .checkbox { background:var(--accent3); border-color:var(--accent3); color:#fff; }
+.check-item.checked > span { text-decoration:line-through; opacity:0.5; }
+.progress-container { background:var(--surface2); border-radius:4px; height:6px; margin-top:14px; overflow:hidden; }
+.progress-fill { height:100%; background:linear-gradient(90deg,var(--accent3),var(--accent)); border-radius:4px; transition:width 0.4s ease; width:0%; }
+.progress-label { font-size:12px; color:var(--text-muted); margin-top:5px; }
+
+/* MASTER PROGRESS */
+.master-progress-wrap { margin-bottom:32px; }
+.master-progress-top { display:flex; justify-content:space-between; margin-bottom:8px; font-size:14px; }
+#completionPct { color:var(--accent); font-weight:700; }
+#masterProgress { height:8px; }
+
+/* MISTAKES */
+.mistakes-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:16px; }
+.mistake-card {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:12px; padding:22px; position:relative;
+}
+.mistake-card h4 { font-family:'Syne',sans-serif; font-size:15px; font-weight:700; color:#ef4444; margin-bottom:8px; }
+.mistake-card p { font-size:13px; color:var(--text-muted); line-height:1.6; }
+.fix-badge {
+  display:inline-block; background:rgba(52,211,153,0.12);
+  border:1px solid rgba(52,211,153,0.3); color:var(--accent3);
+  font-size:11px; padding:3px 10px; border-radius:6px;
+  margin-top:10px; font-weight:600;
+}
+
+/* QUIZ */
+.quiz-card { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:32px; }
+.quiz-q { font-family:'Syne',sans-serif; font-size:18px; font-weight:700; margin-bottom:22px; line-height:1.4; }
+.quiz-options { display:grid; gap:10px; margin-bottom:16px; }
+.quiz-opt {
+  background:var(--surface2); border:1px solid var(--border);
+  padding:13px 16px; border-radius:10px; cursor:pointer;
+  font-size:14px; transition:all 0.2s; text-align:left;
+  color:var(--text); font-family:inherit; width:100%;
+}
+.quiz-opt:hover:not(:disabled) { border-color:var(--accent); color:var(--accent); }
+.quiz-opt.correct { background:rgba(52,211,153,0.12); border-color:var(--accent3); color:var(--accent3); }
+.quiz-opt.wrong { background:rgba(239,68,68,0.08); border-color:#ef4444; color:#ef4444; }
+.quiz-opt:disabled { cursor:default; }
+.quiz-feedback {
+  display:none; padding:14px 16px; border-radius:10px;
+  font-size:14px; line-height:1.6; margin-bottom:16px;
+}
+.quiz-feedback.show { display:block; }
+.quiz-feedback.correct-fb { background:rgba(52,211,153,0.1); color:var(--accent3); border:1px solid rgba(52,211,153,0.2); }
+.quiz-feedback.wrong-fb { background:rgba(239,68,68,0.08); color:#ef4444; border:1px solid rgba(239,68,68,0.2); }
+.quiz-nav { display:flex; align-items:center; gap:14px; margin-top:8px; }
+#quizScore { font-size:13px; color:var(--text-muted); }
+
+/* SCROLL TOP */
+#scrollTopBtn {
+  position:fixed; bottom:28px; right:28px; width:44px; height:44px;
+  border-radius:12px; background:var(--surface2); border:1px solid var(--border);
+  color:var(--text-muted); display:flex; align-items:center; justify-content:center;
+  cursor:pointer; transition:all 0.3s; opacity:0; font-size:18px;
+  z-index:150; pointer-events:none;
+}
+#scrollTopBtn.show { opacity:1; pointer-events:auto; }
+#scrollTopBtn:hover { background:var(--accent); border-color:var(--accent); color:#fff; }
+
+/* FOOTER */
+footer {
+  border-top:1px solid var(--border); padding:48px 40px;
+  text-align:center; color:var(--text-muted); font-size:13px;
+}
+footer strong { color:var(--accent); }
+.footer-tags { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:20px; }
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  nav { padding:12px 18px; }
+  .nav-links { display:none; }
+  .section-wrap { padding:60px 20px; }
+  .hero { padding:90px 20px 60px; }
+  .hero-stats { gap:28px; }
+  .hero-cta { flex-direction:column; align-items:center; }
+  footer { padding:36px 20px; }
+}
+</style>
+</head>
+<body>
+
+<div id="progressBar"></div>
+
+<nav>
+  <div class="nav-logo">
+    <span class="li-badge">in</span> LinkedIn Mastery
+  </div>
+  <ul class="nav-links">
+    <li><a href="#overview">Overview</a></li>
+    <li><a href="#steps">Steps</a></li>
+    <li><a href="#checklist">Checklist</a></li>
+    <li><a href="#mistakes">Mistakes</a></li>
+    <li><a href="#networking">Networking</a></li>
+    <li><a href="#quiz">Quiz</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<div class="hero" id="top">
+  <div class="hero-bg"></div>
+  <div class="hero-badge"><span class="dot"></span>B.Tech Freshers Edition 🎓</div>
+  <h1>Build a LinkedIn<br><span class="grad">That Gets You Hired</span></h1>
+  <p>A complete, no-fluff guide to crafting a professional LinkedIn profile from scratch — even with zero experience.</p>
+  <div class="hero-stats">
+    <div class="stat"><span class="stat-num">10</span><span class="stat-label">Core Steps</span></div>
+    <div class="stat"><span class="stat-num">87%</span><span class="stat-label">Recruiters Use LinkedIn</span></div>
+    <div class="stat"><span class="stat-num">40+</span><span class="stat-label">Pro Tips</span></div>
+  </div>
+  <div class="hero-cta">
+    <a href="#steps" class="btn-primary">Start Building →</a>
+    <a href="#checklist" class="btn-secondary">View Checklist</a>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- OVERVIEW -->
+<div class="section-wrap" id="overview">
+  <div class="section-label">Why LinkedIn Matters</div>
+  <h2 class="section-title">Your Digital First Impression</h2>
+  <p class="section-sub">Before your resume, before the interview — recruiters Google you. Make sure they find something great.</p>
+
+  <div class="two-col">
+    <div>
+      <div class="profile-mockup">
+        <div class="mockup-topbar">
+          <span style="font-family:'Syne',sans-serif;font-weight:800;">LinkedIn</span>
+          <span style="opacity:0.7;font-size:13px;">· Profile Preview</span>
+        </div>
+        <div class="profile-cover">
+          <div class="profile-avatar">👨‍💻</div>
+        </div>
+        <div class="profile-info">
+          <div class="profile-name">Rahul Sharma</div>
+          <div class="profile-headline">B.Tech CS @ NIT Trichy · Aspiring SDE · React · Python · DSA</div>
+          <div class="profile-meta">
+            <span>📍 Trichy, TN</span>
+            <span>🔗 500+ connections</span>
+            <span style="color:#4f8cff">Open to Work</span>
+          </div>
+          <div class="tag-cloud" style="margin-top:14px;">
+            <div class="tag">Python</div>
+            <div class="tag">React</div>
+            <div class="tag">DSA</div>
+            <div class="tag">ML</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="ssi-meter">
+        <h3>Profile Strength Meter</h3>
+        <p style="font-size:13px;color:var(--text-muted);">LinkedIn ranks profiles by completeness. Higher strength = more visibility to recruiters.</p>
+        <div class="ssi-bars">
+          <div class="ssi-bar-item">
+            <div class="ssi-bar-label"><span>Professional Photo</span><span>High Impact</span></div>
+            <div class="ssi-bar-track"><div class="ssi-bar-fill" style="background:var(--accent3);" data-w="90"></div></div>
+          </div>
+          <div class="ssi-bar-item">
+            <div class="ssi-bar-label"><span>Compelling Headline</span><span>Very High</span></div>
+            <div class="ssi-bar-track"><div class="ssi-bar-fill" style="background:var(--accent);" data-w="85"></div></div>
+          </div>
+          <div class="ssi-bar-item">
+            <div class="ssi-bar-label"><span>Detailed Summary</span><span>High</span></div>
+            <div class="ssi-bar-track"><div class="ssi-bar-fill" style="background:var(--accent2);" data-w="78"></div></div>
+          </div>
+          <div class="ssi-bar-item">
+            <div class="ssi-bar-label"><span>Skills & Endorsements</span><span>Medium</span></div>
+            <div class="ssi-bar-track"><div class="ssi-bar-fill" style="background:var(--accent4);" data-w="68"></div></div>
+          </div>
+          <div class="ssi-bar-item">
+            <div class="ssi-bar-label"><span>50+ Connections</span><span>Medium</span></div>
+            <div class="ssi-bar-track"><div class="ssi-bar-fill" style="background:var(--gold);" data-w="58"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- STEPS -->
+<div class="section-wrap" id="steps">
+  <div class="section-label">The Blueprint</div>
+  <h2 class="section-title">10 Steps to a Killer Profile</h2>
+  <p class="section-sub">Click each step to expand the full guide with real examples and pro tips for B.Tech freshers.</p>
+
+  <div class="steps-grid">
+
+    <!-- Step 1 -->
+    <div class="step-card" onclick="toggleStep(this)">
+      <div class="step-header">
+        <div class="step-icon c-blue">📸</div>
+        <div class="step-meta">
+          <h3>Professional Profile Photo</h3>
+          <p>The single biggest factor in profile clicks and recruiter trust</p>
+        </div>
+        <div class="step-toggle">+</div>
+      </div>
+      <div class="step-body">
+        <ul class="tip-list">
+          <li><strong>Use a real headshot</strong> — face clearly visible, taking up 60–70% of the frame. No group photos or selfies.</li>
+          <li><strong>Background:</strong> plain white, light gray, or a clean campus setting. No busy backgrounds.</li>
+          <li><strong>Dress professionally</strong> — business casual at minimum. Your campus fest T-shirt won't cut it.</li>
+          <li><strong>Lighting:</strong> Natural light facing you is ideal. Avoid harsh shadows or backlit shots.</li>
+          <li><strong>Expression:</strong> Smile naturally. Look approachable and confident, not stiff.</li>
+          <li><strong>No filters</strong> — LinkedIn is not Instagram. Keep it authentic and professional.</li>
+        </ul>
+        <div class="example-box">
+          <strong>✓ Good Example</strong>
+          <em>A well-lit headshot in a light blue shirt against a white wall, smiling confidently — taken on a phone with natural window light.</em>
+        </div>
+        <div class="pro-tip">
+          <span class="tip-icon">💡</span>
+          <p><strong>Pro Tip:</strong> Profiles with photos get <strong>21x more views</strong> and <strong>9x more connection requests</strong> than those without. Even a decent phone photo beats no photo.</p>
+        </div>
+        <div class="warning-box">
+          <span class="tip-icon">⚠️</span>
+          <p><strong>Avoid:</strong> Cropped group photos, low resolution, sunglasses, or filters. These scream "not serious."</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="step-card" onclick="toggleStep(this)">
+      <div class="step-header">
+        <div class="step-icon c-purple">✏️</div>
+        <div class="step-meta">
+          <h3>Headline That Sells You</h3>
+          <p>220 characters to define your professional identity</p>
+        </div>
+        <div class="step-toggle">+</div>
+      </div>
+      <div class="step-body">
+        <p style="color:var(--text-muted);font-size:14px;margin-bottom:14px;">Your headline appears in search results, connection requests, and comments. It's your elevator pitch in one line.</p>
+        <ul class="tip-list">
+          <li><strong>Don't just write your degree</strong> — "B.Tech Student" wastes your headline. Add value and direction.</li>
+          <li><strong>Formula:</strong> [Role/Goal] | [Key Skill 1] · [Key Skill 2] | [College/Company]</li>
+          <li><strong>Use keywords</strong> recruiters search: "Full Stack Developer", "Data Analyst", "ML Enthusiast"</li>
+          <li><strong>Add specialization</strong> — "Backend Developer | Node.js · MongoDB · REST APIs" beats "Developer"</li>
+          <li><strong>For freshers:</strong> Use "Aspiring", "Entry-Level", or "Recent Graduate" to set context.</li>
+        </ul>
+        <table class="comp-table">
+          <thead><tr><th>❌ Weak Headline</th><th>✅ Strong Headline</th></tr></thead>
+          <tbody>
+            <tr><td class="bad">B.Tech Student at IIT</td><td class="good">Aspiring SDE | Python · DSA · React | B.Tech CS @ IIT Delhi</td></tr>
+            <tr><td class="bad">Looking for opportunities</td><td class="good">Full Stack Dev | MERN Stack | 2 Hackathon Wins | Open to Work</td></tr>
+            <tr><td class="bad">Engineer</td><td class="good">Data Analyst Intern @ Infosys | SQL · Tableau · Python | NIT Surathkal</td></tr>
+          </tbody>
+        </table>
+        <div class="pro-tip">
+          <span class="tip-icon">💡</span>
+          <p><strong>Pro Tip:</strong> Turn on the <strong>"Open to Work"</strong> feature — it adds a green banner visible to recruiters and signals you're actively job-seeking.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 3 -->
+    <div class="step-card" onclick="toggleStep(this)">
+      <div class="step-header">
+        <div class="step-icon c-green">🎯</div>
+        <div class="step-meta">
+          <h3>About Section (Summary)</h3>
+          <p>Your personal story — the most human part of your profile</p>
+        </div>
+        <div class="step-toggle">+</div>
+      </div>
+      <div class="step-body">
+        <p style="color:var(--text-muted);font-size:14px;margin-bottom:14px;">The About section is where you become a person, not just a resume. Write in first person. Be genuine, clear, and keyword-rich.</p>
+        <ul class="tip-list">
+          <li><strong>Hook in the first 2 lines</strong> — only 3 lines show before "see more". Make them count.</li>
+          <li><strong>Structure:</strong> Who you are → What you build → Where you want to go → Call to action</li>
+          <li><strong>150–250 words max.</strong> Don't write your autobiography.</li>
+          <li><strong>Mention your tech stack,</strong> notable projects, achievements, and aspirations concisely.</li>
+          <li><strong>End with a CTA:</strong> "Feel free to connect" or "Reach me at your@email.com"</li>
+          <li><strong>Use line breaks</strong> — walls of text get skipped. Short paragraphs, occasional emojis are fine.</li>
+        </ul>
+        <div class="example-box">
+          <strong>✓ Sample About (B.Tech Fresher)</strong>
+          <em>🎓 Final-year CS student at NIT Trichy with a passion for building scalable web applications and solving real-world problems through code.<br><br>
+          💻 I work primarily with the MERN stack and have built 3 full-stack projects including a task management app used by 200+ users. I recently placed in the Top 10 at Smart India Hackathon 2024.<br><br>
+          📌 Seeking SDE roles where I can contribute to impactful products while growing as an engineer.<br><br>
+          📧 Reach me at rahul@email.com | Open to opportunities &amp; collaborations.</em>
+        </div>
+        <div class="warning-box">
+          <span class="tip-icon">⚠️</span>
+          <p><strong>Don't do this:</strong> "I am a hardworking, passionate team player looking for a job." — This says nothing unique. Be specific about <em>what</em> you build and <em>what</em> you've achieved.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 4 -->
+    <div class="step-card" onclick="toggleStep(this)">
+      <div class="step-header">
+        <div class="step-icon c-orange">🏫</div>
+        <div class="step-meta">
+          <h3>Education Section</h3>
+          <p>Your academic foundation — more than just your degree</p>
+        </div>
+        <div class="step-toggle">+</div>
+      </div>
+      <div class="step-body">
+        <ul class="tip-list">
+          <li><strong>Add your B.Tech degree</strong> with institution name, graduation year, and CGPA (if 7.0+).</li>
+          <li><strong>Add 12th &amp; 10th</strong> — many companies filter by percentage. Include them.</li>
+          <li><strong>Description field:</strong> Mention relevant coursework — DSA, DBMS, OS, CN, etc.</li>
+          <li><strong>Activities:</strong> Technical clubs, coding societies, student chapters (ACM, CSI, ISTE).</li>
+          <li><strong>Honors:</strong> Merit scholarships, rank in class, department topper — list them all.</li>
+          <li><strong>Start with most recent</strong> — always reverse chronological order.</li>
+        </ul>
+        <div class="pro-tip">
+          <span class="tip-icon">💡</span>
+          <p><strong>Pro Tip:</strong> Adding relevant coursework acts as a keyword booster. Recruiters searching "DBMS + fresher" will find your profile if it's in your education description.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 5 -->
+    <div class="step-card" onclick="toggleStep(this)">
+      <div class="step-header">
+        <div class="step-icon c-blue">💼</div>
+        <div class="step-meta">
+          <h3>Experience & Internships</h3>
+          <p>Even 1 internship is worth 5 bullet points of gold</p>
+        </div>
+        <div class="step-toggle">+</div>
+      </div>
+      <div class="step-body">
+        <p style="color:var(--text-muted);font-size:14px;margin-bottom:14px;">No experience? Use internships, freelance gigs, open-source contributions, and research work. Even informal experience counts if framed right.</p>
+        <ul class="tip-list">
+          <li><strong>Format:</strong> Role | Company | Duration | 3–5 bullet points with impact.</li>
+          <li><strong>Use action verbs:</strong> Built, Designed, Reduced, Increased, Deployed, Led, Automated.</li>
+          <li><strong>Quantify where possible:</strong> "Reduced API response time by 30%" beats "Improved performance".</li>
+          <li><strong>Research counts:</strong> "Research Assistant | [Prof Name] | [Dept]" is real experience.</li>
+          <li><strong>Freelance counts:</strong> "Freelance Web Developer | Self-Employed | 2023–Present".</li>
+          <li><strong>Open Source:</strong> Contributions to GitHub repos count. List them.</li>
+        </ul>
+        <table class="comp-table">
+          <thead><tr><th>❌ Weak</th><th>✅ Strong</th></tr></thead>
+          <tbody>
+            <tr><td class="bad">Worked on backend development</td><td class="good">Built REST APIs using Node.js handling 10K+ daily requests with 99.9% uptime</td></tr>
+            <tr><td class="bad">Helped team with project</td><td class="good">Collaborated with a 4-person team to deliver MVP 2 weeks ahead of deadline</td></tr>
+          </tbody>
+        </table>
+        <div class="warning-box">
+          <span class="tip-icon">⚠️</span>
+          <p><strong>Don't fabricate experience.</strong> Recruiters fact-check. Being caught lying = instant rejection. Instead, frame real work powerfully.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 6 -->
+    <div class="step-card" onclick="toggleStep(this)">
+      <div class="step-header">
+        <div class="step-icon c-purple">🛠️</div>
+        <div class="step-meta">
+          <h3>Projects Section</h3>
+          <p>For freshers, projects ARE your portfolio</p>
+        </div>
+        <div class="step-toggle">+</div>
+      </div>
+      <div class="step-body">
+        <ul class="tip-list">
+          <li><strong>Add 3–5 strong projects</strong> — quality over quantity. Each showcasing a different skill.</li>
+          <li><strong>Write a description</strong> — what it does, tech stack, and your role.</li>
+          <li><strong>Link GitHub/live demo</strong> — always. A project without a link is a missed opportunity.</li>
+          <li><strong>Mention scale or results:</strong> "2000+ users", "Deployed on AWS", "Winner at HackX".</li>
+          <li><strong>Good project types:</strong> Web apps, CLI tools, ML models, mobile apps, open source contributions.</li>
+        </ul>
+        <div class="example-box">
+          <strong>✓ Sample Project Entry</strong>
+          <em><strong>DevTrack — Project Management Web App</strong><br>
+          Full-stack app built with React, Node.js &amp; MongoDB. Real-time updates via WebSocket. Deployed on Render with 200+ active users.<br>
+          🔗 github.com/rahul/devtrack</em>
+        </div>
+        <div class="pro-tip">
+          <span class="tip-icon">💡</span>
+          <p><strong>Pro Tip:</strong> Add projects even if incomplete — showing you build things matters. A half-built deployed project beats a perfect project that only lives locally.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 7 -->
+    <div class="step-card" onclick="toggleStep(this)">
+      <div class="step-header">
+        <div class="step-icon c-green">⚡</div>
+        <div class="step-meta">
+          <h3>Skills & Endorsements</h3>
+          <p>Keywords that make you discoverable in recruiter searches</p>
+        </div>
+        <div class="step-toggle">+</div>
+      </div>
+      <div class="step-body">
+        <ul class="tip-list">
+          <li><strong>Add 10–20 relevant skills.</strong> LinkedIn allows 50 but focus on quality.</li>
+          <li><strong>Categorize:</strong> Technical (Python, React, SQL), Soft (Leadership), Domain (Web Dev, Data Science).</li>
+          <li><strong>Pin your top 3 skills</strong> — the ones you want recruiters to see first.</li>
+          <li><strong>Get endorsements:</strong> Ask classmates, professors, or internship colleagues.</li>
+          <li><strong>Skills = search filters:</strong> If it's not listed, you won't appear in filtered searches.</li>
+        </ul>
+        <p style="font-size:13px;color:var(--text-muted);margin:14px 0 6px;">Sample skills for a CS fresher:</p>
+        <div class="tag-cloud">
+          <div class="tag">Python</div><div class="tag">JavaScript</div><div class="tag">React.js</div>
+          <div class="tag">Node.js</div><div class="tag">SQL</div><div class="tag">Git &amp; GitHub</div>
+          <div class="tag">DSA</div><div class="tag">Machine Learning</div><div class="tag">REST APIs</div>
+          <div class="tag">MongoDB</div><div class="tag">C++</div><div class="tag">Linux</div>
+          <div class="tag">Agile</div><div class="tag">Problem Solving</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 8 -->
+    <div class="step-card" onclick="toggleStep(this)">
+      <div class="step-header">
+        <div class="step-icon c-gold">🏆</div>
+        <div class="step-meta">
+          <h3>Certifications & Courses</h3>
+          <p>Prove skills beyond your degree</p>
+        </div>
+        <div class="step-toggle">+</div>
+      </div>
+      <div class="step-body">
+        <ul class="tip-list">
+          <li><strong>Add all relevant certs</strong> — Coursera, NPTEL, edX, Google, AWS, Microsoft, etc.</li>
+          <li><strong>Include the issuer and year</strong> — credibility comes from the source.</li>
+          <li><strong>Link the certificate</strong> — always attach the URL or credential ID.</li>
+          <li><strong>NPTEL is gold</strong> — Elite + Silver/Gold certificates carry weight with Indian recruiters.</li>
+          <li><strong>Don't overlist:</strong> 5–8 strong, relevant certs beats 20 random ones.</li>
+        </ul>
+        <div class="example-box">
+          <strong>✓ High-Value Certifications for CS Freshers</strong>
+          <em>Google Data Analytics (Coursera) · AWS Cloud Practitioner · NPTEL Data Science Elite · Meta Front-End Developer · Microsoft AZ-900 · DeepLearning.AI ML Specialization</em>
+        </div>
+        <div class="pro-tip">
+          <span class="tip-icon">💡</span>
+          <p><strong>Free certs:</strong> Google (Coursera financial aid), NPTEL, GitHub Skills, freeCodeCamp, Microsoft Learn — all free, all credible.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 9 -->
+    <div class="step-card" onclick="toggleStep(this)">
+      <div class="step-header">
+        <div class="step-icon c-orange">🌐</div>
+        <div class="step-meta">
+          <h3>Custom URL & Contact Info</h3>
+          <p>Small change, big professionalism boost</p>
+        </div>
+        <div class="step-toggle">+</div>
+      </div>
+      <div class="step-body">
+        <ul class="tip-list">
+          <li><strong>Customize your LinkedIn URL</strong> — change from the default gibberish to linkedin.com/in/rahulsharmacs. Clean, shareable, professional.</li>
+          <li><strong>Add professional email</strong> — firstname.lastname@gmail.com. Not coolboy99@gmail.com.</li>
+          <li><strong>Add your GitHub profile</strong> — critical for tech roles.</li>
+          <li><strong>Add portfolio website</strong> if you have one. Even a GitHub Pages site counts.</li>
+          <li><strong>Location:</strong> Add city/state — recruiter searches often filter by location.</li>
+        </ul>
+        <div class="pro-tip">
+          <span class="tip-icon">💡</span>
+          <p><strong>Format:</strong> linkedin.com/in/firstname-lastname or linkedin.com/in/firstnamelastnamedev — put this on your resume for instant profile access.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 10 -->
+    <div class="step-card" onclick="toggleStep(this)">
+      <div class="step-header">
+        <div class="step-icon c-blue">🎖️</div>
+        <div class="step-meta">
+          <h3>Recommendations & Achievements</h3>
+          <p>Social proof that seals the deal</p>
+        </div>
+        <div class="step-toggle">+</div>
+      </div>
+      <div class="step-body">
+        <ul class="tip-list">
+          <li><strong>Request 2–3 recommendations</strong> — from professors, internship managers, or senior project teammates.</li>
+          <li><strong>Make it easy:</strong> Write a draft they can edit and note the skills you'd like highlighted.</li>
+          <li><strong>Honors &amp; Awards:</strong> Hackathon wins, coding contest placements, scholarships, departmental ranks.</li>
+          <li><strong>Volunteer Experience:</strong> Teaching assistantships, NGO work, college event organizing all count.</li>
+          <li><strong>Publications:</strong> Conference papers, workshop papers, or research abstracts belong here too.</li>
+        </ul>
+        <div class="timeline">
+          <div class="timeline-item">
+            <div class="timeline-time">Week 1</div>
+            <h4>Ask a professor you know well</h4>
+            <p>Share your profile link and mention the skills/projects from their class.</p>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-time">Week 2</div>
+            <h4>Reach out to your internship mentor</h4>
+            <p>A manager's recommendation is extremely valuable — even 3 lines carry weight.</p>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-time">Week 3</div>
+            <h4>Ask a senior project teammate</h4>
+            <p>Peer recommendations from seniors who led projects are also valid and respected.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- NETWORKING -->
+<div class="section-wrap" id="networking">
+  <div class="section-label">The Secret Weapon</div>
+  <h2 class="section-title">Networking & Staying Active</h2>
+  <p class="section-sub">A great profile + zero activity = invisible. LinkedIn rewards engagement. Here's how to be strategic.</p>
+
+  <div class="two-col">
+    <div class="step-card" style="cursor:default;">
+      <div class="step-header">
+        <div class="step-icon c-blue">🤝</div>
+        <div class="step-meta"><h3>Who to Connect With</h3><p>Build smart, not just big</p></div>
+      </div>
+      <div class="step-body" style="display:block;border-top:1px solid var(--border);padding-top:20px;margin-top:20px;">
+        <ul class="tip-list">
+          <li><strong>Alumni from your college</strong> — most likely to respond. Search "[College Name] alumni".</li>
+          <li><strong>Placed seniors</strong> from your department — ask for referrals or advice.</li>
+          <li><strong>Recruiters at target companies</strong> — connect with a personalized note.</li>
+          <li><strong>Professors and TAs</strong> — academic connections add credibility.</li>
+          <li><strong>Hackathon participants</strong> — a ready network of like-minded builders.</li>
+          <li><strong>Always personalize:</strong> Default "I'd like to connect" = ignored 90% of the time.</li>
+        </ul>
+        <div class="example-box">
+          <strong>✓ Sample Connection Request</strong>
+          <em>"Hi [Name], I'm a final-year CS student at NIT Trichy interested in backend development. I came across your profile while researching [Company] and was impressed by your work on [X]. I'd love to connect and learn from your journey!"</em>
+        </div>
+      </div>
+    </div>
+    <div class="step-card" style="cursor:default;">
+      <div class="step-header">
+        <div class="step-icon c-green">📣</div>
+        <div class="step-meta"><h3>Content Strategy</h3><p>Post to be found, not just to post</p></div>
+      </div>
+      <div class="step-body" style="display:block;border-top:1px solid var(--border);padding-top:20px;margin-top:20px;">
+        <ul class="tip-list">
+          <li><strong>Post once a week</strong> to stay in feeds. Consistency beats volume.</li>
+          <li><strong>What to post:</strong> Project updates, learning journeys, internship experiences, tech opinions.</li>
+          <li><strong>Document your learning:</strong> "Today I learned X about Y" posts resonate hugely with tech recruiters.</li>
+          <li><strong>Comment meaningfully</strong> on posts by industry leaders — builds visibility fast.</li>
+          <li><strong>Share GitHub links</strong> in posts about your projects.</li>
+          <li><strong>Use 3–5 hashtags:</strong> #Python #WebDev #OpenToWork #BTechLife</li>
+        </ul>
+        <div class="pro-tip">
+          <span class="tip-icon">💡</span>
+          <p><strong>The magic formula:</strong> A post about your project journey (what you built, struggled with, learned) gets <strong>10x more engagement</strong> than "I'm looking for a job."</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- CHECKLIST -->
+<div class="section-wrap" id="checklist">
+  <div class="section-label">Before You Hit Publish</div>
+  <h2 class="section-title">Profile Completion Checklist</h2>
+  <p class="section-sub">Tick these off one by one. 100% puts you in the "All Star" profile tier on LinkedIn.</p>
+
+  <div class="master-progress-wrap">
+    <div class="master-progress-top">
+      <span style="color:var(--text-muted)">Overall Completion</span>
+      <span id="completionPct">0%</span>
+    </div>
+    <div class="progress-container"><div class="progress-fill" id="masterProgress"></div></div>
+  </div>
+
+  <div class="checklist-grid">
+
+    <div class="checklist-card">
+      <h4>🖼️ Profile Basics</h4>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="checkbox"></div><span>Professional profile photo added</span></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="checkbox"></div><span>Custom banner/cover image added</span></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="checkbox"></div><span>Compelling headline written</span></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="checkbox"></div><span>Custom LinkedIn URL set</span></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="checkbox"></div><span>Location added</span></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="checkbox"></div><span>Open to Work badge turned on</span></div>
+      <div class="progress-container"><div class="progress-fill card-progress"></div></div>
+      <div class="progress-label card-label">0 / 6 complete</div>
+    </div>
+
+    <div class="checklist-card">
+      <h4>📝 About & Story</h4>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="checkbox"></div><span>About section written (150–250 words)</span></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="checkbox"></div><span>First 2 lines are a strong hook</span></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="checkbox"></div><span>Keywords included in About</span></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="checkbox"></div><span>CTA (email/contact) added at the end</span></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="checkbox"></div><span>No generic phrases used</span></div>
+      <div class="progress-container"><div class="progress-fill card-progress"></div></div>
+      <div class="progress-label card-label">0 / 5 complete</div>
+    </div>
+
+    <div class="checklist-card">
+      <h4>🎓 Education & Experience</h4>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="checkbox"></div><span>B.Tech degree added with CGPA</span></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="checkbox"></div><span>12th &amp; 10th marks added</span></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="checkbox"></div><span>Relevant coursework mentioned</span></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="checkbox"></div><span>At least 1 internship/experience added</span></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="checkbox"></div><span>Impact-focused bullet points written</span></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="checkbox"></div><span>3+ projects added with GitHub links</span></div>
+      <div class="progress-container"><div class="progress-fill card-progress"></div></div>
+      <div class="progress-label card-label">0 / 6 complete</div>
+    </div>
+
+    <div class="checklist-card">
+      <h4>🏅 Skills & Credibility</h4>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="checkbox"></div><span>10+ skills added and ordered</span></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="checkbox"></div><span>Top 3 skills pinned</span></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="checkbox"></div><span>At least 5 endorsements received</span></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="checkbox"></div><span>3+ certifications added with links</span></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="checkbox"></div><span>1+ recommendation received</span></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="checkbox"></div><span>Awards/achievements listed</span></div>
+      <div class="progress-container"><div class="progress-fill card-progress"></div></div>
+      <div class="progress-label card-label">0 / 6 complete</div>
+    </div>
+
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- MISTAKES -->
+<div class="section-wrap" id="mistakes">
+  <div class="section-label">What NOT to Do</div>
+  <h2 class="section-title">Common Mistakes That Cost You Jobs</h2>
+  <p class="section-sub">Recruiters scan dozens of profiles daily. These are instant red flags that get you skipped.</p>
+
+  <div class="mistakes-grid">
+    <div class="mistake-card"><h4>No Profile Photo</h4><p>Profiles without photos get 21x fewer views. You look like a ghost or spam account. Any decent photo beats none.</p><span class="fix-badge">✓ Fix: Add a clean headshot today</span></div>
+    <div class="mistake-card"><h4>Generic Headline</h4><p>"Student at XYZ University" tells recruiters nothing. You're wasting prime real estate.</p><span class="fix-badge">✓ Fix: Use the headline formula</span></div>
+    <div class="mistake-card"><h4>Empty About Section</h4><p>Leaving About blank shows you haven't invested in your profile. Recruiters skip it instantly.</p><span class="fix-badge">✓ Fix: Write 150 words minimum</span></div>
+    <div class="mistake-card"><h4>No GitHub / Portfolio Links</h4><p>Claiming React skills without a live project link is unverifiable. Recruiters won't take your word for it.</p><span class="fix-badge">✓ Fix: Link GitHub on every project</span></div>
+    <div class="mistake-card"><h4>Zero Activity</h4><p>A stale profile with no posts or engagement looks abandoned. LinkedIn deprioritizes inactive profiles in search.</p><span class="fix-badge">✓ Fix: Post or comment weekly</span></div>
+    <div class="mistake-card"><h4>Blank Connection Requests</h4><p>Default requests to strangers are ignored 90% of the time. A 3-line personal note doubles acceptance rates.</p><span class="fix-badge">✓ Fix: Always personalize notes</span></div>
+    <div class="mistake-card"><h4>Listing Duties, Not Achievements</h4><p>"Responsible for backend development" is a job description. "Built APIs handling 50K requests/day" is an achievement.</p><span class="fix-badge">✓ Fix: Quantify every bullet point</span></div>
+    <div class="mistake-card"><h4>Unprofessional Email</h4><p>coolcoder99@gmail.com immediately undermines your credibility before any interview even happens.</p><span class="fix-badge">✓ Fix: Use firstname.lastname@gmail.com</span></div>
+    <div class="mistake-card"><h4>Lying About Skills</h4><p>Inflating skills or experience is easily caught in technical interviews. Honesty, framed powerfully, always wins.</p><span class="fix-badge">✓ Fix: Be honest; frame real work better</span></div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- QUIZ -->
+<div class="section-wrap" id="quiz">
+  <div class="section-label">Test Your Knowledge</div>
+  <h2 class="section-title">Quick-Fire Quiz</h2>
+  <p class="section-sub">5 questions to see if you've absorbed the essentials. No pressure — just learning!</p>
+
+  <div class="quiz-card">
+    <div id="quizContent"></div>
+    <div id="quizFeedback" class="quiz-feedback"></div>
+    <div class="quiz-nav">
+      <button class="btn-primary" id="quizNextBtn" onclick="nextQuestion()">Next →</button>
+      <span id="quizScore"></span>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <p>Built for <strong>B.Tech Freshers</strong> entering the Indian tech job market 🚀</p>
+  <p style="margin-top:8px;font-size:12px;">Follow the steps, stay consistent, and your LinkedIn will work for you 24/7.</p>
+  <div class="footer-tags">
+    <div class="tag" onclick="window.open('https://linkedin.com','_blank')">🔗 Open LinkedIn</div>
+    <div class="tag" onclick="window.open('https://github.com','_blank')">🐙 Open GitHub</div>
+    <div class="tag" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑ Back to Top</div>
+  </div>
+</footer>
+
+<button id="scrollTopBtn" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<script>
+// ── PROGRESS BAR ──
+window.addEventListener('scroll', function() {
+  var pct = (window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100;
+  document.getElementById('progressBar').style.width = pct + '%';
+  var btn = document.getElementById('scrollTopBtn');
+  if (window.scrollY > 400) btn.classList.add('show');
+  else btn.classList.remove('show');
+});
+
+// ── SSI BARS ──
+function animateSSI() {
+  document.querySelectorAll('.ssi-bar-fill[data-w]').forEach(function(bar) {
+    bar.style.width = bar.getAttribute('data-w') + '%';
+  });
+}
+var ssiDone = false;
+var ssiMeter = document.querySelector('.ssi-meter');
+if (ssiMeter) {
+  var ssiObs = new IntersectionObserver(function(entries) {
+    if (entries[0].isIntersecting && !ssiDone) {
+      ssiDone = true;
+      setTimeout(animateSSI, 200);
+    }
+  }, { threshold: 0.3 });
+  ssiObs.observe(ssiMeter);
+}
+
+// ── STEP TOGGLE ──
+function toggleStep(card) {
+  var isActive = card.classList.contains('active');
+  document.querySelectorAll('.step-card[onclick]').forEach(function(c) { c.classList.remove('active'); });
+  if (!isActive) card.classList.add('active');
+}
+
+// ── CHECKLIST ──
+function toggleCheck(item) {
+  item.classList.toggle('checked');
+  item.querySelector('.checkbox').textContent = item.classList.contains('checked') ? '✓' : '';
+  updateProgress();
+}
+
+function updateProgress() {
+  var cards = document.querySelectorAll('.checklist-card');
+  var totalDone = 0, totalAll = 0;
+  cards.forEach(function(card) {
+    var all = card.querySelectorAll('.check-item').length;
+    var done = card.querySelectorAll('.check-item.checked').length;
+    totalDone += done; totalAll += all;
+    var pct = all > 0 ? (done / all * 100) : 0;
+    var bar = card.querySelector('.card-progress');
+    var lbl = card.querySelector('.card-label');
+    if (bar) bar.style.width = pct + '%';
+    if (lbl) lbl.textContent = done + ' / ' + all + ' complete';
+  });
+  var master = totalAll > 0 ? Math.round(totalDone / totalAll * 100) : 0;
+  document.getElementById('masterProgress').style.width = master + '%';
+  document.getElementById('completionPct').textContent = master + '%';
+}
+
+// ── QUIZ ──
+var questions = [
+  {
+    q: "What is the maximum character limit for a LinkedIn headline?",
+    options: ["60 characters", "120 characters", "220 characters", "500 characters"],
+    correct: 2,
+    explain: "LinkedIn allows up to 220 characters for your headline. Use it strategically with keywords, role, skills, and college name."
+  },
+  {
+    q: "Which headline is best for a B.Tech fresher?",
+    options: [
+      "B.Tech Student looking for jobs",
+      "Aspiring SDE | Python · DSA · React | B.Tech CS @ NIT | Open to Work",
+      "Engineer at College",
+      "Passionate and hardworking developer"
+    ],
+    correct: 1,
+    explain: "Option B uses the correct formula: Role + Skills + College + Status. It's keyword-rich and immediately communicates your professional identity."
+  },
+  {
+    q: "How many more views do profiles WITH a photo get vs those without?",
+    options: ["2x more", "5x more", "14x more", "21x more"],
+    correct: 3,
+    explain: "LinkedIn data shows profiles with photos get 21x more views and 9x more connection requests. Always add a professional headshot."
+  },
+  {
+    q: "What should you ALWAYS include when listing a project on LinkedIn?",
+    options: [
+      "Only the project name",
+      "A 500-word description",
+      "GitHub/live demo link + tech stack + your role",
+      "All team members' names"
+    ],
+    correct: 2,
+    explain: "Projects without links are unverifiable. Always include a GitHub repo or live demo, the tech stack, and your specific role."
+  },
+  {
+    q: "Which experience bullet point format is correct?",
+    options: [
+      "Responsible for developing the application",
+      "Worked on frontend tasks",
+      "Built React dashboard that reduced report generation time by 40%",
+      "Helped with coding and debugging"
+    ],
+    correct: 2,
+    explain: "Great bullet points use action verbs + quantified results. Be specific about what you built and the measurable impact."
+  }
+];
+
+var currentQ = 0;
+var score = 0;
+var answered = false;
+
+function renderQuestion() {
+  answered = false;
+  var q = questions[currentQ];
+  var html = '<div class="quiz-q">Q' + (currentQ+1) + ' of ' + questions.length + ': ' + q.q + '</div><div class="quiz-options">';
+  q.options.forEach(function(opt, i) {
+    html += '<button class="quiz-opt" id="qopt' + i + '" onclick="selectAnswer(' + i + ')">' + opt + '</button>';
+  });
+  html += '</div>';
+  document.getElementById('quizContent').innerHTML = html;
+  document.getElementById('quizFeedback').className = 'quiz-feedback';
+  document.getElementById('quizFeedback').innerHTML = '';
+  document.getElementById('quizNextBtn').style.display = 'none';
+  document.getElementById('quizScore').textContent = 'Score: ' + score + ' / ' + questions.length;
+}
+
+function selectAnswer(idx) {
+  if (answered) return;
+  answered = true;
+  var q = questions[currentQ];
+  // disable all buttons
+  for (var i = 0; i < q.options.length; i++) {
+    var btn = document.getElementById('qopt' + i);
+    btn.disabled = true;
+    if (i === q.correct) btn.classList.add('correct');
+    else if (i === idx) btn.classList.add('wrong');
+  }
+  var fb = document.getElementById('quizFeedback');
+  if (idx === q.correct) {
+    score++;
+    fb.className = 'quiz-feedback show correct-fb';
+    fb.innerHTML = '✅ <strong>Correct!</strong> ' + q.explain;
+  } else {
+    fb.className = 'quiz-feedback show wrong-fb';
+    fb.innerHTML = '❌ <strong>Not quite.</strong> ' + q.explain;
+  }
+  document.getElementById('quizScore').textContent = 'Score: ' + score + ' / ' + questions.length;
+  document.getElementById('quizNextBtn').style.display = 'inline-flex';
+  document.getElementById('quizNextBtn').textContent = (currentQ < questions.length - 1) ? 'Next →' : 'See Results 🎉';
+}
+
+function nextQuestion() {
+  currentQ++;
+  if (currentQ >= questions.length) {
+    showResults();
+  } else {
+    renderQuestion();
+  }
+}
+
+function showResults() {
+  var msg = score === 5 ? '🏆 Perfect score! You\'re ready to build an amazing profile.'
+    : score >= 3 ? '👍 Good job! Review the sections you missed and you\'ll be all set.'
+    : '📚 Keep reading the guide above — you\'ll ace it on the next try!';
+  document.getElementById('quizContent').innerHTML =
+    '<div style="text-align:center;padding:20px 0;">' +
+    '<div style="font-size:54px;margin-bottom:14px;">🎓</div>' +
+    '<h3 style="font-family:Syne,sans-serif;font-size:22px;font-weight:800;margin-bottom:10px;letter-spacing:-0.5px;">Quiz Complete!</h3>' +
+    '<p style="font-size:28px;font-weight:700;color:var(--accent);font-family:Syne,sans-serif;margin-bottom:10px;">' + score + ' / 5</p>' +
+    '<p style="color:var(--text-muted);font-size:15px;max-width:400px;margin:0 auto;">' + msg + '</p>' +
+    '</div>';
+  document.getElementById('quizFeedback').className = 'quiz-feedback';
+  document.getElementById('quizNextBtn').textContent = '↺ Retry';
+  document.getElementById('quizNextBtn').onclick = function() { currentQ=0; score=0; renderQuestion(); document.getElementById('quizNextBtn').onclick = nextQuestion; };
+  document.getElementById('quizScore').textContent = '';
+}
+
+renderQuestion();
+</script>
+</body>
+</html>
