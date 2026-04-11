@@ -471,6 +471,211 @@ code {
 </style>
 </head>
 <body>
+
+<!-- ===== GLOBAL NAVBAR START ===== -->
+<style>
+/* ---------- NAVBAR VARIABLES ---------- */
+:root {
+  --nb-glass: rgba(255,255,255,0.18);
+  --nb-glass-active: rgba(255,255,255,0.92);
+  --nb-border: rgba(255,255,255,0.35);
+  --nb-shadow: 0 8px 32px rgba(0,0,0,0.18), 0 1.5px 8px rgba(0,0,0,0.10);
+  --nb-text: rgba(255,255,255,0.85);
+  --nb-text-active: #1a1a2e;
+  --nb-radius: 999px;
+  --nb-arrow-size: 52px;
+}
+
+/* ---------- MAIN NAV WRAPPER ---------- */
+.global-nav-wrapper {
+  position: fixed;
+  top: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: max-content;
+  max-width: calc(100vw - 140px);
+}
+
+/* ---------- CURVED GLASS NAV BAR ---------- */
+.global-navbar {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  background: var(--nb-glass);
+  backdrop-filter: blur(22px) saturate(180%);
+  -webkit-backdrop-filter: blur(22px) saturate(180%);
+  border: 1.5px solid var(--nb-border);
+  border-radius: var(--nb-radius);
+  padding: 5px 6px;
+  box-shadow: var(--nb-shadow);
+  position: relative;
+  transition: background 0.3s ease;
+}
+
+.global-navbar:hover {
+  background: rgba(255,255,255,0.24);
+}
+
+/* ---------- NAV LINKS ---------- */
+.nav-link-custom {
+  display: flex;
+  align-items: center;
+  padding: 7px 15px;
+  border-radius: var(--nb-radius);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--nb-text) !important;
+  text-decoration: none !important;
+  letter-spacing: 0.01em;
+  transition: all 0.25s cubic-bezier(0.4,0,0.2,1);
+  white-space: nowrap;
+  position: relative;
+  font-family: 'Outfit', 'Syne', 'DM Sans', system-ui, sans-serif;
+}
+
+.nav-link-custom:hover {
+  background: rgba(255,255,255,0.22);
+  color: #fff !important;
+  transform: translateY(-1px);
+}
+
+/* ---------- ACTIVE STATE ---------- */
+.nav-link-custom.nav-item-active {
+  background: rgba(255,255,255,0.92) !important;
+  color: #1a1a2e !important;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.18), 0 1px 4px rgba(0,0,0,0.10);
+  pointer-events: none;
+  font-weight: 700;
+}
+
+.nav-link-custom.nav-item-active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.7);
+  display: none;
+}
+
+/* ---------- ARROW BUTTONS ---------- */
+.nav-arrow {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 99998;
+  width: var(--nb-arrow-size);
+  height: var(--nb-arrow-size);
+  border-radius: 50%;
+  background: var(--nb-glass);
+  backdrop-filter: blur(22px) saturate(180%);
+  -webkit-backdrop-filter: blur(22px) saturate(180%);
+  border: 1.5px solid var(--nb-border);
+  box-shadow: var(--nb-shadow);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none !important;
+  color: rgba(255,255,255,0.92) !important;
+  font-size: 26px;
+  font-weight: 300;
+  transition: all 0.25s cubic-bezier(0.4,0,0.2,1);
+  cursor: pointer;
+  overflow: visible;
+}
+
+.nav-arrow:hover {
+  background: rgba(255,255,255,0.92);
+  color: #1a1a2e !important;
+  transform: translateY(-50%) scale(1.08);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.22), 0 2px 8px rgba(0,0,0,0.14);
+}
+
+.nav-arrow-left  { left: 16px; }
+.nav-arrow-right { right: 16px; }
+
+.arrow-icon {
+  line-height: 1;
+  font-style: normal;
+  font-family: Georgia, serif;
+  user-select: none;
+}
+
+/* ---------- ARROW TOOLTIPS ---------- */
+.arrow-tooltip {
+  position: absolute;
+  background: rgba(255,255,255,0.92);
+  color: #1a1a2e;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 5px 11px;
+  border-radius: 999px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.22s ease;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.14);
+  font-family: 'Outfit', 'Syne', system-ui, sans-serif;
+  transform: translateY(0px);
+}
+
+.nav-arrow-left  .arrow-tooltip { left: calc(100% + 10px); top: 50%; transform: translateY(-50%); }
+.nav-arrow-right .arrow-tooltip { right: calc(100% + 10px); top: 50%; transform: translateY(-50%); }
+
+.nav-arrow:hover .arrow-tooltip {
+  opacity: 1;
+  transform: translateY(-50%);
+}
+
+/* ---------- PAGE BODY OFFSET ---------- */
+body { padding-top: 72px !important; }
+
+/* ---------- RESPONSIVE ---------- */
+@media (max-width: 768px) {
+  .global-nav-wrapper { max-width: calc(100vw - 100px); }
+  .nav-link-custom { padding: 6px 10px; font-size: 11.5px; }
+  :root { --nb-arrow-size: 42px; }
+  .nav-arrow { font-size: 22px; }
+  .nav-arrow-left  { left: 8px; }
+  .nav-arrow-right { right: 8px; }
+  .arrow-tooltip { display: none; }
+}
+
+@media (max-width: 520px) {
+  .nav-link-custom { padding: 5px 7px; font-size: 10.5px; }
+}
+</style>
+
+<a href="ml-algorithms-intro.html" class="nav-arrow nav-arrow-left" title="Previous: 🤖 ML Algorithms">
+  <span class="arrow-icon">‹</span>
+  <div class="arrow-tooltip">🤖 ML Algorithms</div>
+</a>
+<a href="llm.html" class="nav-arrow nav-arrow-right" title="Next: 🧠 LLMs">
+  <span class="arrow-icon">›</span>
+  <div class="arrow-tooltip">🧠 LLMs</div>
+</a>
+
+<div class="global-nav-wrapper">
+  <nav class="global-navbar">
+    <a href="kedar__profile.html" class="nav-link-custom " title="👤 Profile">👤 Profile</a>
+<a href="data_collection.html" class="nav-link-custom " title="📊 Data Collection">📊 Data Collection</a>
+<a href="Train-test-split.html" class="nav-link-custom " title="✂️ Train-Test Split">✂️ Train-Test Split</a>
+<a href="ml-algorithms-intro.html" class="nav-link-custom " title="🤖 ML Algorithms">🤖 ML Algorithms</a>
+<a href="feature-importance.html" class="nav-link-custom nav-item-active" title="⭐ Feature Importance">⭐ Feature Importance</a>
+<a href="llm.html" class="nav-link-custom " title="🧠 LLMs">🧠 LLMs</a>
+<a href="linkedin-guide.html" class="nav-link-custom " title="💼 LinkedIn Guide">💼 LinkedIn Guide</a>
+
+  </nav>
+</div>
+<!-- ===== GLOBAL NAVBAR END ===== -->
+
 <div class="container">
 
   <!-- HEADER -->

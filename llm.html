@@ -1,1253 +1,2428 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LLMs — The Intelligence Behind the Words</title>
-<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --bg: #050810;
-    --bg2: #080e1a;
-    --bg3: #0d1525;
-    --panel: #0f1930;
-    --border: #1a2d50;
-    --accent: #00d4ff;
-    --accent2: #7c3aed;
-    --accent3: #10b981;
-    --accent4: #f59e0b;
-    --text: #e2e8f0;
-    --text-muted: #64748b;
-    --text-dim: #94a3b8;
-    --glow: 0 0 20px rgba(0,212,255,0.3);
-    --glow2: 0 0 20px rgba(124,58,237,0.3);
-  }
-  * { margin:0; padding:0; box-sizing:border-box; }
-  html { scroll-behavior: smooth; }
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'DM Sans', sans-serif;
-    font-weight: 300;
-    overflow-x: hidden;
-  }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LLMs — The Intelligence Behind the Words</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --bg: #050810;
+      --bg2: #080e1a;
+      --bg3: #0d1525;
+      --panel: #0f1930;
+      --border: #1a2d50;
+      --accent: #00d4ff;
+      --accent2: #7c3aed;
+      --accent3: #10b981;
+      --accent4: #f59e0b;
+      --text: #e2e8f0;
+      --text-muted: #64748b;
+      --text-dim: #94a3b8;
+      --glow: 0 0 20px rgba(0, 212, 255, 0.3);
+      --glow2: 0 0 20px rgba(124, 58, 237, 0.3);
+    }
 
-  /* ── NAV ── */
-  nav {
-    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 16px 40px;
-    background: rgba(5,8,16,0.85);
-    backdrop-filter: blur(12px);
-    border-bottom: 1px solid var(--border);
-  }
-  .nav-logo {
-    font-family: 'Space Mono', monospace;
-    color: var(--accent); font-size: 14px; letter-spacing: 2px;
-  }
-  .nav-links { display: flex; gap: 28px; }
-  .nav-links a {
-    color: var(--text-muted); text-decoration: none; font-size: 13px;
-    letter-spacing: 0.5px; transition: color .2s;
-  }
-  .nav-links a:hover { color: var(--accent); }
-  .progress-bar {
-    position: fixed; top: 61px; left: 0; right: 0; height: 2px; z-index: 99;
-    background: var(--border);
-  }
-  .progress-fill {
-    height: 100%; width: 0%; background: linear-gradient(90deg, var(--accent2), var(--accent));
-    transition: width .1s;
-  }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-  /* ── HERO ── */
-  .hero {
-    min-height: 100vh;
-    display: flex; align-items: center; justify-content: center;
-    position: relative; overflow: hidden; padding: 80px 40px 40px;
-  }
-  .hero-bg {
-    position: absolute; inset: 0;
-    background:
-      radial-gradient(ellipse 60% 50% at 30% 50%, rgba(124,58,237,0.12) 0%, transparent 70%),
-      radial-gradient(ellipse 40% 40% at 75% 30%, rgba(0,212,255,0.08) 0%, transparent 60%);
-  }
-  .neural-canvas {
-    position: absolute; inset: 0; opacity: 0.3;
-  }
-  .hero-content { position: relative; z-index: 2; max-width: 900px; text-align: center; }
-  .hero-tag {
-    display: inline-flex; align-items: center; gap: 8px;
-    background: rgba(0,212,255,0.08); border: 1px solid rgba(0,212,255,0.2);
-    border-radius: 100px; padding: 6px 16px; margin-bottom: 32px;
-    font-family: 'Space Mono', monospace; font-size: 12px; color: var(--accent);
-    letter-spacing: 1px;
-  }
-  .hero-tag::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); animation: pulse 2s infinite; }
-  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
-  .hero h1 {
-    font-family: 'Syne', sans-serif; font-size: clamp(48px,7vw,88px);
-    font-weight: 800; line-height: 1.0;
-    background: linear-gradient(135deg, #fff 0%, var(--accent) 50%, var(--accent2) 100%);
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    background-clip: text; margin-bottom: 24px;
-    animation: fadeUp 0.8s ease forwards;
-  }
-  @keyframes fadeUp { from{opacity:0;transform:translateY(30px)} to{opacity:1;transform:translateY(0)} }
-  .hero-sub {
-    font-size: 20px; color: var(--text-dim); line-height: 1.7; max-width: 640px;
-    margin: 0 auto 48px; font-weight: 300;
-    animation: fadeUp 0.8s ease 0.2s both;
-  }
-  .hero-ctas {
-    display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;
-    animation: fadeUp 0.8s ease 0.4s both;
-  }
-  .btn {
-    padding: 14px 28px; border-radius: 8px; font-size: 15px; cursor: pointer;
-    font-family: 'DM Sans', sans-serif; font-weight: 500; transition: all .2s;
-    text-decoration: none; display: inline-block; border: none;
-  }
-  .btn-primary {
-    background: linear-gradient(135deg, var(--accent2), var(--accent));
-    color: #fff; box-shadow: 0 0 30px rgba(0,212,255,0.2);
-  }
-  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 0 40px rgba(0,212,255,0.35); }
-  .btn-ghost {
-    background: transparent; color: var(--text);
-    border: 1px solid var(--border); color: var(--text-dim);
-  }
-  .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
-  .hero-stats {
-    margin-top: 64px; display: flex; gap: 48px; justify-content: center;
-    animation: fadeUp 0.8s ease 0.6s both;
-  }
-  .stat { text-align: center; }
-  .stat-n { font-family:'Syne',sans-serif; font-size:36px; font-weight:800; color:var(--accent); }
-  .stat-l { font-size:13px; color:var(--text-muted); margin-top:4px; }
+    html {
+      scroll-behavior: smooth;
+    }
 
-  /* ── SECTIONS ── */
-  section { padding: 100px 40px; max-width: 1100px; margin: 0 auto; }
-  .section-tag {
-    font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: 3px;
-    color: var(--accent); text-transform: uppercase; margin-bottom: 16px;
-  }
-  h2 {
-    font-family: 'Syne', sans-serif; font-size: clamp(32px,4vw,52px);
-    font-weight: 800; line-height: 1.15; margin-bottom: 20px;
-  }
-  .section-lead { font-size: 18px; color: var(--text-dim); line-height: 1.8; max-width: 680px; margin-bottom: 60px; }
-  .divider { width: 100%; height: 1px; background: var(--border); margin: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      overflow-x: hidden;
+    }
 
-  /* ── DEFINITION CARD ── */
-  .definition-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 48px; }
-  .def-card {
-    background: var(--panel); border: 1px solid var(--border);
-    border-radius: 16px; padding: 32px;
-    transition: border-color .3s, box-shadow .3s;
-    position: relative; overflow: hidden;
-  }
-  .def-card::before {
-    content:''; position:absolute; top:0; left:0; right:0; height:2px;
-    background: linear-gradient(90deg, var(--accent2), var(--accent));
-    transform: scaleX(0); transition: transform .3s; transform-origin: left;
-  }
-  .def-card:hover::before { transform: scaleX(1); }
-  .def-card:hover { border-color: rgba(0,212,255,0.3); box-shadow: 0 0 30px rgba(0,212,255,0.07); }
-  .def-icon { font-size: 32px; margin-bottom: 16px; }
-  .def-card h3 { font-family:'Syne',sans-serif; font-size:20px; font-weight:700; margin-bottom:12px; }
-  .def-card p { color: var(--text-dim); font-size: 15px; line-height: 1.75; }
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 40px;
+      background: rgba(5, 8, 16, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
 
-  /* ── COMPARISON TABLE ── */
-  .compare-table { width:100%; border-collapse:collapse; border-radius:12px; overflow:hidden; }
-  .compare-table th {
-    background: var(--panel); padding: 16px 20px; text-align:left;
-    font-family:'Space Mono',monospace; font-size:12px; letter-spacing:1px;
-    color: var(--accent); border-bottom: 1px solid var(--border);
-  }
-  .compare-table td {
-    padding: 16px 20px; font-size:14px; color: var(--text-dim);
-    border-bottom: 1px solid rgba(26,45,80,0.5);
-    background: rgba(13,21,37,0.5);
-  }
-  .compare-table tr:hover td { background: var(--panel); color: var(--text); }
-  .compare-table td:first-child { color: var(--text); font-weight:500; }
-  .badge {
-    display:inline-block; padding:3px 10px; border-radius:100px; font-size:12px;
-    font-family:'Space Mono',monospace;
-  }
-  .badge-blue { background:rgba(0,212,255,0.12); color:var(--accent); }
-  .badge-purple { background:rgba(124,58,237,0.12); color:#a78bfa; }
+    .nav-logo {
+      font-family: 'Space Mono', monospace;
+      color: var(--accent);
+      font-size: 14px;
+      letter-spacing: 2px;
+    }
 
-  /* ── TOKENIZER DEMO ── */
-  .interactive-box {
-    background: var(--panel); border: 1px solid var(--border); border-radius: 20px;
-    padding: 40px; margin-bottom: 48px;
-  }
-  .interactive-box h3 {
-    font-family:'Syne',sans-serif; font-size:22px; font-weight:700; margin-bottom:8px;
-  }
-  .interactive-box .hint { color:var(--text-muted); font-size:14px; margin-bottom:24px; }
-  .demo-input {
-    width:100%; background: var(--bg3); border:1px solid var(--border);
-    border-radius:10px; padding:16px 20px; font-size:16px;
-    color:var(--text); font-family:'DM Sans',sans-serif;
-    outline:none; transition:border-color .2s;
-  }
-  .demo-input:focus { border-color: var(--accent); }
-  .token-display {
-    display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; min-height: 48px;
-    align-items: center;
-  }
-  .token {
-    padding: 6px 12px; border-radius: 6px; font-family:'Space Mono',monospace;
-    font-size: 13px; border: 1px solid; animation: tokenPop .2s ease;
-  }
-  @keyframes tokenPop { from{transform:scale(0.8);opacity:0} to{transform:scale(1);opacity:1} }
-  .token-stats { margin-top:16px; display:flex; gap:24px; }
-  .token-stat { font-family:'Space Mono',monospace; font-size:13px; color:var(--text-muted); }
-  .token-stat span { color:var(--accent); }
+    .nav-links {
+      display: flex;
+      gap: 28px;
+    }
 
-  /* ── TRANSFORMER ARCHITECTURE ── */
-  .arch-flow {
-    display: flex; flex-direction: column; gap: 0; position: relative;
-  }
-  .arch-step {
-    display: flex; align-items: stretch; gap: 0;
-    cursor: pointer; transition: transform .2s;
-  }
-  .arch-step:hover { transform: translateX(8px); }
-  .arch-num {
-    width: 60px; display:flex; align-items:center; justify-content:center;
-    font-family:'Space Mono',monospace; font-size:24px; font-weight:700;
-    color: var(--text-muted); flex-shrink:0;
-  }
-  .arch-connector {
-    width:2px; background: var(--border); margin:0 auto; height:30px; align-self:stretch;
-    display:block;
-  }
-  .arch-card {
-    flex:1; background:var(--bg3); border:1px solid var(--border);
-    border-radius:14px; padding:24px 28px; margin: 0 0 0 16px;
-    transition: border-color .3s, background .3s;
-  }
-  .arch-step.active .arch-card {
-    border-color: var(--accent); background: rgba(0,212,255,0.04);
-  }
-  .arch-step.active .arch-num { color: var(--accent); }
-  .arch-card h4 { font-family:'Syne',sans-serif; font-size:18px; font-weight:700; margin-bottom:8px; }
-  .arch-card p { color:var(--text-dim); font-size:14px; line-height:1.75; }
-  .arch-detail {
-    background: rgba(0,212,255,0.05); border:1px solid rgba(0,212,255,0.15);
-    border-radius:10px; padding:16px; margin-top:14px; font-size:13px;
-    color:var(--text-dim); line-height:1.8; display:none;
-    font-family:'Space Mono',monospace;
-  }
-  .arch-step.active .arch-detail { display:block; }
+    .nav-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 13px;
+      letter-spacing: 0.5px;
+      transition: color .2s;
+    }
 
-  /* ── TIMELINE ── */
-  .timeline { position:relative; }
-  .timeline-line {
-    position:absolute; left:120px; top:0; bottom:0; width:2px;
-    background: linear-gradient(180deg, var(--accent2), var(--accent));
-    opacity:0.3;
-  }
-  .timeline-item {
-    display:flex; gap:40px; margin-bottom:40px; align-items:flex-start;
-    opacity:0; transform:translateX(-20px);
-    transition: opacity .5s, transform .5s;
-  }
-  .timeline-item.visible { opacity:1; transform:translateX(0); }
-  .timeline-year {
-    width:100px; text-align:right; flex-shrink:0;
-    font-family:'Space Mono',monospace; font-size:16px; font-weight:700;
-    color:var(--accent); padding-top:18px;
-  }
-  .timeline-dot {
-    width:20px; height:20px; border-radius:50%; flex-shrink:0; margin-top:18px;
-    border:2px solid var(--accent); background:var(--bg);
-    transition: background .3s; position:relative; z-index:1;
-  }
-  .timeline-item:hover .timeline-dot { background:var(--accent); }
-  .timeline-content {
-    flex:1; background:var(--panel); border:1px solid var(--border);
-    border-radius:14px; padding:24px; transition: border-color .3s;
-  }
-  .timeline-item:hover .timeline-content { border-color: rgba(0,212,255,0.3); }
-  .timeline-model { font-family:'Syne',sans-serif; font-size:20px; font-weight:700; margin-bottom:6px; }
-  .timeline-desc { color:var(--text-dim); font-size:14px; line-height:1.7; }
-  .timeline-badge { display:inline-block; margin-top:10px; }
+    .nav-links a:hover {
+      color: var(--accent);
+    }
 
-  /* ── ATTENTION VIZ ── */
-  .attention-demo {
-    background: var(--panel); border:1px solid var(--border);
-    border-radius:20px; padding:40px;
-  }
-  .attn-sentence {
-    display:flex; flex-wrap:wrap; gap:8px; margin-bottom:32px;
-  }
-  .attn-word {
-    padding:10px 16px; border-radius:8px; cursor:pointer;
-    font-size:18px; font-weight:500; transition:all .2s;
-    background: var(--bg3); border:2px solid transparent;
-    font-family:'Syne',sans-serif;
-  }
-  .attn-word:hover { border-color:var(--accent); }
-  .attn-word.selected { border-color:var(--accent); background:rgba(0,212,255,0.1); color:var(--accent); }
-  .attn-heatmap {
-    display:flex; flex-wrap:wrap; gap:8px; margin-top:24px;
-  }
-  .attn-cell {
-    padding:10px 16px; border-radius:8px; font-size:16px;
-    font-family:'Syne',sans-serif; font-weight:500;
-    transition:all .4s;
-  }
-  .attn-label { font-size:13px; color:var(--text-muted); margin-bottom:12px; font-family:'Space Mono',monospace; }
+    .progress-bar {
+      position: fixed;
+      top: 61px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      z-index: 99;
+      background: var(--border);
+    }
 
-  /* ── TOKEN PREDICTOR ── */
-  .predictor-box {
-    background:var(--panel); border:1px solid var(--border);
-    border-radius:20px; padding:40px;
-  }
-  .predictor-display {
-    background:var(--bg3); border:1px solid var(--border); border-radius:12px;
-    padding:24px; font-family:'Space Mono',monospace; font-size:18px;
-    min-height:80px; margin-bottom:24px; line-height:1.8; color:var(--text);
-    position:relative;
-  }
-  .cursor-blink {
-    display:inline-block; width:2px; height:20px; background:var(--accent);
-    vertical-align:middle; animation:blink 1s infinite;
-  }
-  @keyframes blink { 0%,49%{opacity:1} 50%,100%{opacity:0} }
-  .predictions-list { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:24px; }
-  .pred-token {
-    padding:8px 16px; border-radius:8px; cursor:pointer;
-    background:var(--bg3); border:1px solid var(--border);
-    font-family:'Space Mono',monospace; font-size:13px; color:var(--text-dim);
-    transition:all .2s; display:flex; align-items:center; gap:8px;
-  }
-  .pred-token:hover { border-color:var(--accent); color:var(--accent); }
-  .pred-bar {
-    height:4px; border-radius:2px; background:var(--accent);
-    opacity:0.4; width:0; transition:width .3s;
-  }
-  .pred-pct { font-size:11px; color:var(--text-muted); }
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--accent2), var(--accent));
+      transition: width .1s;
+    }
 
-  /* ── RAG DIAGRAM ── */
-  .rag-flow {
-    display:grid; grid-template-columns:repeat(5,1fr); gap:0; align-items:center;
-    margin-bottom:48px;
-  }
-  .rag-node {
-    background:var(--panel); border:1px solid var(--border); border-radius:14px;
-    padding:24px 16px; text-align:center; transition:all .3s;
-    position:relative;
-  }
-  .rag-node:hover { border-color:var(--accent); transform:translateY(-4px); box-shadow:var(--glow); }
-  .rag-icon { font-size:32px; margin-bottom:12px; }
-  .rag-label { font-family:'Syne',sans-serif; font-size:14px; font-weight:700; margin-bottom:6px; }
-  .rag-desc { font-size:12px; color:var(--text-muted); line-height:1.5; }
-  .rag-arrow {
-    font-size:24px; color:var(--accent); text-align:center;
-    animation:arrowPulse 1.5s infinite;
-  }
-  @keyframes arrowPulse { 0%,100%{opacity:0.4;transform:translateX(0)} 50%{opacity:1;transform:translateX(4px)} }
-  .rag-problem-cards { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
-  .rag-problem {
-    background:var(--bg3); border:1px solid var(--border); border-radius:12px;
-    padding:24px; display:flex; gap:16px;
-  }
-  .prob-icon { font-size:24px; flex-shrink:0; }
-  .prob-title { font-weight:600; margin-bottom:6px; font-size:15px; }
-  .prob-text { font-size:13px; color:var(--text-muted); line-height:1.6; }
-  .prob-sol { font-size:13px; color:var(--accent3); margin-top:8px; }
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      padding: 80px 40px 40px;
+    }
 
-  /* ── QUIZ ── */
-  .quiz-card {
-    background:var(--panel); border:1px solid var(--border); border-radius:20px;
-    padding:40px; margin-bottom:24px;
-  }
-  .quiz-question { font-family:'Syne',sans-serif; font-size:20px; font-weight:700; margin-bottom:24px; }
-  .quiz-options { display:flex; flex-direction:column; gap:12px; }
-  .quiz-opt {
-    padding:16px 20px; border-radius:10px; cursor:pointer;
-    background:var(--bg3); border:2px solid var(--border);
-    font-size:15px; transition:all .2s; text-align:left;
-    font-family:'DM Sans',sans-serif;
-  }
-  .quiz-opt:hover { border-color:var(--accent2); }
-  .quiz-opt.correct { border-color:var(--accent3)!important; background:rgba(16,185,129,0.08)!important; color:var(--accent3); }
-  .quiz-opt.wrong { border-color:#ef4444!important; background:rgba(239,68,68,0.08)!important; color:#ef4444; }
-  .quiz-feedback {
-    margin-top:16px; padding:16px 20px; border-radius:10px; font-size:14px;
-    line-height:1.7; display:none;
-  }
-  .quiz-feedback.show { display:block; }
-  .quiz-feedback.correct-fb { background:rgba(16,185,129,0.08); border:1px solid rgba(16,185,129,0.2); color:var(--accent3); }
-  .quiz-feedback.wrong-fb { background:rgba(239,68,68,0.05); border:1px solid rgba(239,68,68,0.2); color:#f87171; }
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 60% 50% at 30% 50%, rgba(124, 58, 237, 0.12) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 40% at 75% 30%, rgba(0, 212, 255, 0.08) 0%, transparent 60%);
+    }
 
-  /* ── GLOSSARY ── */
-  .glossary-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
-  .gloss-item {
-    background:var(--bg3); border:1px solid var(--border); border-radius:12px;
-    padding:20px 24px; transition:border-color .2s;
-  }
-  .gloss-item:hover { border-color:rgba(0,212,255,0.3); }
-  .gloss-term { font-family:'Space Mono',monospace; font-size:13px; color:var(--accent); margin-bottom:8px; }
-  .gloss-def { font-size:14px; color:var(--text-dim); line-height:1.7; }
+    .neural-canvas {
+      position: absolute;
+      inset: 0;
+      opacity: 0.3;
+    }
 
-  /* ── SUMMARY BANNER ── */
-  .summary-banner {
-    background: linear-gradient(135deg, rgba(124,58,237,0.1), rgba(0,212,255,0.05));
-    border:1px solid rgba(0,212,255,0.15); border-radius:20px; padding:48px;
-    text-align:center; margin-top:80px; position:relative; overflow:hidden;
-  }
-  .summary-banner::before {
-    content:''; position:absolute; top:-50%; left:-20%; width:60%; height:200%;
-    background:radial-gradient(ellipse, rgba(124,58,237,0.15), transparent 60%);
-    pointer-events:none;
-  }
-  .summary-banner h2 { font-family:'Syne',sans-serif; font-size:36px; margin-bottom:16px; }
-  .summary-banner p { color:var(--text-dim); max-width:540px; margin:0 auto 32px; font-size:16px; line-height:1.8; }
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      max-width: 900px;
+      text-align: center;
+    }
 
-  /* MISC */
-  .tag-row { display:flex; flex-wrap:wrap; gap:10px; margin-top:16px; }
-  .chip {
-    padding:6px 14px; border-radius:100px; font-size:13px;
-    background:rgba(0,212,255,0.08); border:1px solid rgba(0,212,255,0.2);
-    color:var(--accent); font-family:'Space Mono',monospace;
-  }
-  .chip.purple { background:rgba(124,58,237,0.1); border-color:rgba(124,58,237,0.3); color:#a78bfa; }
-  .chip.green { background:rgba(16,185,129,0.1); border-color:rgba(16,185,129,0.3); color:var(--accent3); }
-  .two-col { display:grid; grid-template-columns:1fr 1fr; gap:40px; align-items:start; }
-  .info-block { background:var(--bg3); border:1px solid var(--border); border-radius:14px; padding:28px; }
-  .info-block h4 { font-family:'Syne',sans-serif; font-size:17px; font-weight:700; margin-bottom:12px; }
-  .info-block ul { list-style:none; display:flex; flex-direction:column; gap:10px; }
-  .info-block ul li { font-size:14px; color:var(--text-dim); padding-left:20px; position:relative; line-height:1.6; }
-  .info-block ul li::before { content:'→'; position:absolute; left:0; color:var(--accent); font-size:12px; top:2px; }
+    .hero-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(0, 212, 255, 0.08);
+      border: 1px solid rgba(0, 212, 255, 0.2);
+      border-radius: 100px;
+      padding: 6px 16px;
+      margin-bottom: 32px;
+      font-family: 'Space Mono', monospace;
+      font-size: 12px;
+      color: var(--accent);
+      letter-spacing: 1px;
+    }
 
-  /* Limitations */
-  .limit-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:20px; }
-  .limit-card {
-    background:var(--bg3); border:1px solid var(--border); border-radius:12px;
-    padding:24px; text-align:center; transition:all .3s;
-  }
-  .limit-card:hover { border-color:rgba(239,68,68,0.3); }
-  .limit-icon { font-size:32px; margin-bottom:12px; }
-  .limit-title { font-weight:600; font-size:15px; margin-bottom:8px; }
-  .limit-text { font-size:13px; color:var(--text-muted); line-height:1.6; }
+    .hero-tag::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      animation: pulse 2s infinite;
+    }
 
-  /* FOOTER */
-  footer {
-    border-top:1px solid var(--border); padding:32px 40px;
-    display:flex; justify-content:space-between; align-items:center;
-    color:var(--text-muted); font-size:13px;
-  }
-  footer span { font-family:'Space Mono',monospace; color:var(--accent); }
+    @keyframes pulse {
 
-  @media(max-width:768px) {
-    nav { padding:16px 20px; }
-    .nav-links { display:none; }
-    section { padding:60px 20px; }
-    .definition-grid, .two-col, .glossary-grid, .rag-problem-cards, .limit-grid { grid-template-columns:1fr; }
-    .rag-flow { grid-template-columns:1fr; }
-    .rag-arrow { transform:rotate(90deg); }
-    .hero-stats { flex-wrap:wrap; gap:24px; }
-    .timeline-line { left:80px; }
-    .timeline-year { width:60px; font-size:14px; }
-    footer { flex-direction:column; gap:12px; text-align:center; }
-  }
-</style>
+      0%,
+      100% {
+        opacity: 1
+      }
+
+      50% {
+        opacity: 0.3
+      }
+    }
+
+    .hero h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(48px, 7vw, 88px);
+      font-weight: 800;
+      line-height: 1.0;
+      background: linear-gradient(135deg, #fff 0%, var(--accent) 50%, var(--accent2) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 24px;
+      animation: fadeUp 0.8s ease forwards;
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0)
+      }
+    }
+
+    .hero-sub {
+      font-size: 20px;
+      color: var(--text-dim);
+      line-height: 1.7;
+      max-width: 640px;
+      margin: 0 auto 48px;
+      font-weight: 300;
+      animation: fadeUp 0.8s ease 0.2s both;
+    }
+
+    .hero-ctas {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+      animation: fadeUp 0.8s ease 0.4s both;
+    }
+
+    .btn {
+      padding: 14px 28px;
+      border-radius: 8px;
+      font-size: 15px;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 500;
+      transition: all .2s;
+      text-decoration: none;
+      display: inline-block;
+      border: none;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent2), var(--accent));
+      color: #fff;
+      box-shadow: 0 0 30px rgba(0, 212, 255, 0.2);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 40px rgba(0, 212, 255, 0.35);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+    }
+
+    .btn-ghost:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .hero-stats {
+      margin-top: 64px;
+      display: flex;
+      gap: 48px;
+      justify-content: center;
+      animation: fadeUp 0.8s ease 0.6s both;
+    }
+
+    .stat {
+      text-align: center;
+    }
+
+    .stat-n {
+      font-family: 'Syne', sans-serif;
+      font-size: 36px;
+      font-weight: 800;
+      color: var(--accent);
+    }
+
+    .stat-l {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* ── SECTIONS ── */
+    section {
+      padding: 100px 40px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .section-tag {
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 3px;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+
+    h2 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(32px, 4vw, 52px);
+      font-weight: 800;
+      line-height: 1.15;
+      margin-bottom: 20px;
+    }
+
+    .section-lead {
+      font-size: 18px;
+      color: var(--text-dim);
+      line-height: 1.8;
+      max-width: 680px;
+      margin-bottom: 60px;
+    }
+
+    .divider {
+      width: 100%;
+      height: 1px;
+      background: var(--border);
+      margin: 0;
+    }
+
+    /* ── DEFINITION CARD ── */
+    .definition-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 48px;
+    }
+
+    .def-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px;
+      transition: border-color .3s, box-shadow .3s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .def-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent2), var(--accent));
+      transform: scaleX(0);
+      transition: transform .3s;
+      transform-origin: left;
+    }
+
+    .def-card:hover::before {
+      transform: scaleX(1);
+    }
+
+    .def-card:hover {
+      border-color: rgba(0, 212, 255, 0.3);
+      box-shadow: 0 0 30px rgba(0, 212, 255, 0.07);
+    }
+
+    .def-icon {
+      font-size: 32px;
+      margin-bottom: 16px;
+    }
+
+    .def-card h3 {
+      font-family: 'Syne', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .def-card p {
+      color: var(--text-dim);
+      font-size: 15px;
+      line-height: 1.75;
+    }
+
+    /* ── COMPARISON TABLE ── */
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .compare-table th {
+      background: var(--panel);
+      padding: 16px 20px;
+      text-align: left;
+      font-family: 'Space Mono', monospace;
+      font-size: 12px;
+      letter-spacing: 1px;
+      color: var(--accent);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .compare-table td {
+      padding: 16px 20px;
+      font-size: 14px;
+      color: var(--text-dim);
+      border-bottom: 1px solid rgba(26, 45, 80, 0.5);
+      background: rgba(13, 21, 37, 0.5);
+    }
+
+    .compare-table tr:hover td {
+      background: var(--panel);
+      color: var(--text);
+    }
+
+    .compare-table td:first-child {
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 100px;
+      font-size: 12px;
+      font-family: 'Space Mono', monospace;
+    }
+
+    .badge-blue {
+      background: rgba(0, 212, 255, 0.12);
+      color: var(--accent);
+    }
+
+    .badge-purple {
+      background: rgba(124, 58, 237, 0.12);
+      color: #a78bfa;
+    }
+
+    /* ── TOKENIZER DEMO ── */
+    .interactive-box {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 40px;
+      margin-bottom: 48px;
+    }
+
+    .interactive-box h3 {
+      font-family: 'Syne', sans-serif;
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .interactive-box .hint {
+      color: var(--text-muted);
+      font-size: 14px;
+      margin-bottom: 24px;
+    }
+
+    .demo-input {
+      width: 100%;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px 20px;
+      font-size: 16px;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      outline: none;
+      transition: border-color .2s;
+    }
+
+    .demo-input:focus {
+      border-color: var(--accent);
+    }
+
+    .token-display {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 20px;
+      min-height: 48px;
+      align-items: center;
+    }
+
+    .token {
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-family: 'Space Mono', monospace;
+      font-size: 13px;
+      border: 1px solid;
+      animation: tokenPop .2s ease;
+    }
+
+    @keyframes tokenPop {
+      from {
+        transform: scale(0.8);
+        opacity: 0
+      }
+
+      to {
+        transform: scale(1);
+        opacity: 1
+      }
+    }
+
+    .token-stats {
+      margin-top: 16px;
+      display: flex;
+      gap: 24px;
+    }
+
+    .token-stat {
+      font-family: 'Space Mono', monospace;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .token-stat span {
+      color: var(--accent);
+    }
+
+    /* ── TRANSFORMER ARCHITECTURE ── */
+    .arch-flow {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      position: relative;
+    }
+
+    .arch-step {
+      display: flex;
+      align-items: stretch;
+      gap: 0;
+      cursor: pointer;
+      transition: transform .2s;
+    }
+
+    .arch-step:hover {
+      transform: translateX(8px);
+    }
+
+    .arch-num {
+      width: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Space Mono', monospace;
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--text-muted);
+      flex-shrink: 0;
+    }
+
+    .arch-connector {
+      width: 2px;
+      background: var(--border);
+      margin: 0 auto;
+      height: 30px;
+      align-self: stretch;
+      display: block;
+    }
+
+    .arch-card {
+      flex: 1;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 24px 28px;
+      margin: 0 0 0 16px;
+      transition: border-color .3s, background .3s;
+    }
+
+    .arch-step.active .arch-card {
+      border-color: var(--accent);
+      background: rgba(0, 212, 255, 0.04);
+    }
+
+    .arch-step.active .arch-num {
+      color: var(--accent);
+    }
+
+    .arch-card h4 {
+      font-family: 'Syne', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .arch-card p {
+      color: var(--text-dim);
+      font-size: 14px;
+      line-height: 1.75;
+    }
+
+    .arch-detail {
+      background: rgba(0, 212, 255, 0.05);
+      border: 1px solid rgba(0, 212, 255, 0.15);
+      border-radius: 10px;
+      padding: 16px;
+      margin-top: 14px;
+      font-size: 13px;
+      color: var(--text-dim);
+      line-height: 1.8;
+      display: none;
+      font-family: 'Space Mono', monospace;
+    }
+
+    .arch-step.active .arch-detail {
+      display: block;
+    }
+
+    /* ── TIMELINE ── */
+    .timeline {
+      position: relative;
+    }
+
+    .timeline-line {
+      position: absolute;
+      left: 120px;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: linear-gradient(180deg, var(--accent2), var(--accent));
+      opacity: 0.3;
+    }
+
+    .timeline-item {
+      display: flex;
+      gap: 40px;
+      margin-bottom: 40px;
+      align-items: flex-start;
+      opacity: 0;
+      transform: translateX(-20px);
+      transition: opacity .5s, transform .5s;
+    }
+
+    .timeline-item.visible {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .timeline-year {
+      width: 100px;
+      text-align: right;
+      flex-shrink: 0;
+      font-family: 'Space Mono', monospace;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--accent);
+      padding-top: 18px;
+    }
+
+    .timeline-dot {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      margin-top: 18px;
+      border: 2px solid var(--accent);
+      background: var(--bg);
+      transition: background .3s;
+      position: relative;
+      z-index: 1;
+    }
+
+    .timeline-item:hover .timeline-dot {
+      background: var(--accent);
+    }
+
+    .timeline-content {
+      flex: 1;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 24px;
+      transition: border-color .3s;
+    }
+
+    .timeline-item:hover .timeline-content {
+      border-color: rgba(0, 212, 255, 0.3);
+    }
+
+    .timeline-model {
+      font-family: 'Syne', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .timeline-desc {
+      color: var(--text-dim);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .timeline-badge {
+      display: inline-block;
+      margin-top: 10px;
+    }
+
+    /* ── ATTENTION VIZ ── */
+    .attention-demo {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 40px;
+    }
+
+    .attn-sentence {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 32px;
+    }
+
+    .attn-word {
+      padding: 10px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 18px;
+      font-weight: 500;
+      transition: all .2s;
+      background: var(--bg3);
+      border: 2px solid transparent;
+      font-family: 'Syne', sans-serif;
+    }
+
+    .attn-word:hover {
+      border-color: var(--accent);
+    }
+
+    .attn-word.selected {
+      border-color: var(--accent);
+      background: rgba(0, 212, 255, 0.1);
+      color: var(--accent);
+    }
+
+    .attn-heatmap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 24px;
+    }
+
+    .attn-cell {
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-family: 'Syne', sans-serif;
+      font-weight: 500;
+      transition: all .4s;
+    }
+
+    .attn-label {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+      font-family: 'Space Mono', monospace;
+    }
+
+    /* ── TOKEN PREDICTOR ── */
+    .predictor-box {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 40px;
+    }
+
+    .predictor-display {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      font-family: 'Space Mono', monospace;
+      font-size: 18px;
+      min-height: 80px;
+      margin-bottom: 24px;
+      line-height: 1.8;
+      color: var(--text);
+      position: relative;
+    }
+
+    .cursor-blink {
+      display: inline-block;
+      width: 2px;
+      height: 20px;
+      background: var(--accent);
+      vertical-align: middle;
+      animation: blink 1s infinite;
+    }
+
+    @keyframes blink {
+
+      0%,
+      49% {
+        opacity: 1
+      }
+
+      50%,
+      100% {
+        opacity: 0
+      }
+    }
+
+    .predictions-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+
+    .pred-token {
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      font-family: 'Space Mono', monospace;
+      font-size: 13px;
+      color: var(--text-dim);
+      transition: all .2s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .pred-token:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .pred-bar {
+      height: 4px;
+      border-radius: 2px;
+      background: var(--accent);
+      opacity: 0.4;
+      width: 0;
+      transition: width .3s;
+    }
+
+    .pred-pct {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    /* ── RAG DIAGRAM ── */
+    .rag-flow {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0;
+      align-items: center;
+      margin-bottom: 48px;
+    }
+
+    .rag-node {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 24px 16px;
+      text-align: center;
+      transition: all .3s;
+      position: relative;
+    }
+
+    .rag-node:hover {
+      border-color: var(--accent);
+      transform: translateY(-4px);
+      box-shadow: var(--glow);
+    }
+
+    .rag-icon {
+      font-size: 32px;
+      margin-bottom: 12px;
+    }
+
+    .rag-label {
+      font-family: 'Syne', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .rag-desc {
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    .rag-arrow {
+      font-size: 24px;
+      color: var(--accent);
+      text-align: center;
+      animation: arrowPulse 1.5s infinite;
+    }
+
+    @keyframes arrowPulse {
+
+      0%,
+      100% {
+        opacity: 0.4;
+        transform: translateX(0)
+      }
+
+      50% {
+        opacity: 1;
+        transform: translateX(4px)
+      }
+    }
+
+    .rag-problem-cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .rag-problem {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      display: flex;
+      gap: 16px;
+    }
+
+    .prob-icon {
+      font-size: 24px;
+      flex-shrink: 0;
+    }
+
+    .prob-title {
+      font-weight: 600;
+      margin-bottom: 6px;
+      font-size: 15px;
+    }
+
+    .prob-text {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    .prob-sol {
+      font-size: 13px;
+      color: var(--accent3);
+      margin-top: 8px;
+    }
+
+    /* ── QUIZ ── */
+    .quiz-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 40px;
+      margin-bottom: 24px;
+    }
+
+    .quiz-question {
+      font-family: 'Syne', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 24px;
+    }
+
+    .quiz-options {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .quiz-opt {
+      padding: 16px 20px;
+      border-radius: 10px;
+      cursor: pointer;
+      background: var(--bg3);
+      border: 2px solid var(--border);
+      font-size: 15px;
+      transition: all .2s;
+      text-align: left;
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    .quiz-opt:hover {
+      border-color: var(--accent2);
+    }
+
+    .quiz-opt.correct {
+      border-color: var(--accent3) !important;
+      background: rgba(16, 185, 129, 0.08) !important;
+      color: var(--accent3);
+    }
+
+    .quiz-opt.wrong {
+      border-color: #ef4444 !important;
+      background: rgba(239, 68, 68, 0.08) !important;
+      color: #ef4444;
+    }
+
+    .quiz-feedback {
+      margin-top: 16px;
+      padding: 16px 20px;
+      border-radius: 10px;
+      font-size: 14px;
+      line-height: 1.7;
+      display: none;
+    }
+
+    .quiz-feedback.show {
+      display: block;
+    }
+
+    .quiz-feedback.correct-fb {
+      background: rgba(16, 185, 129, 0.08);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+      color: var(--accent3);
+    }
+
+    .quiz-feedback.wrong-fb {
+      background: rgba(239, 68, 68, 0.05);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+      color: #f87171;
+    }
+
+    /* ── GLOSSARY ── */
+    .glossary-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .gloss-item {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px 24px;
+      transition: border-color .2s;
+    }
+
+    .gloss-item:hover {
+      border-color: rgba(0, 212, 255, 0.3);
+    }
+
+    .gloss-term {
+      font-family: 'Space Mono', monospace;
+      font-size: 13px;
+      color: var(--accent);
+      margin-bottom: 8px;
+    }
+
+    .gloss-def {
+      font-size: 14px;
+      color: var(--text-dim);
+      line-height: 1.7;
+    }
+
+    /* ── SUMMARY BANNER ── */
+    .summary-banner {
+      background: linear-gradient(135deg, rgba(124, 58, 237, 0.1), rgba(0, 212, 255, 0.05));
+      border: 1px solid rgba(0, 212, 255, 0.15);
+      border-radius: 20px;
+      padding: 48px;
+      text-align: center;
+      margin-top: 80px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .summary-banner::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -20%;
+      width: 60%;
+      height: 200%;
+      background: radial-gradient(ellipse, rgba(124, 58, 237, 0.15), transparent 60%);
+      pointer-events: none;
+    }
+
+    .summary-banner h2 {
+      font-family: 'Syne', sans-serif;
+      font-size: 36px;
+      margin-bottom: 16px;
+    }
+
+    .summary-banner p {
+      color: var(--text-dim);
+      max-width: 540px;
+      margin: 0 auto 32px;
+      font-size: 16px;
+      line-height: 1.8;
+    }
+
+    /* MISC */
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .chip {
+      padding: 6px 14px;
+      border-radius: 100px;
+      font-size: 13px;
+      background: rgba(0, 212, 255, 0.08);
+      border: 1px solid rgba(0, 212, 255, 0.2);
+      color: var(--accent);
+      font-family: 'Space Mono', monospace;
+    }
+
+    .chip.purple {
+      background: rgba(124, 58, 237, 0.1);
+      border-color: rgba(124, 58, 237, 0.3);
+      color: #a78bfa;
+    }
+
+    .chip.green {
+      background: rgba(16, 185, 129, 0.1);
+      border-color: rgba(16, 185, 129, 0.3);
+      color: var(--accent3);
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      align-items: start;
+    }
+
+    .info-block {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 28px;
+    }
+
+    .info-block h4 {
+      font-family: 'Syne', sans-serif;
+      font-size: 17px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .info-block ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .info-block ul li {
+      font-size: 14px;
+      color: var(--text-dim);
+      padding-left: 20px;
+      position: relative;
+      line-height: 1.6;
+    }
+
+    .info-block ul li::before {
+      content: '→';
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+      font-size: 12px;
+      top: 2px;
+    }
+
+    /* Limitations */
+    .limit-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+    }
+
+    .limit-card {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      text-align: center;
+      transition: all .3s;
+    }
+
+    .limit-card:hover {
+      border-color: rgba(239, 68, 68, 0.3);
+    }
+
+    .limit-icon {
+      font-size: 32px;
+      margin-bottom: 12px;
+    }
+
+    .limit-title {
+      font-weight: 600;
+      font-size: 15px;
+      margin-bottom: 8px;
+    }
+
+    .limit-text {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 32px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+
+    footer span {
+      font-family: 'Space Mono', monospace;
+      color: var(--accent);
+    }
+
+    @media(max-width:768px) {
+      nav {
+        padding: 16px 20px;
+      }
+
+      .nav-links {
+        display: none;
+      }
+
+      section {
+        padding: 60px 20px;
+      }
+
+      .definition-grid,
+      .two-col,
+      .glossary-grid,
+      .rag-problem-cards,
+      .limit-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .rag-flow {
+        grid-template-columns: 1fr;
+      }
+
+      .rag-arrow {
+        transform: rotate(90deg);
+      }
+
+      .hero-stats {
+        flex-wrap: wrap;
+        gap: 24px;
+      }
+
+      .timeline-line {
+        left: 80px;
+      }
+
+      .timeline-year {
+        width: 60px;
+        font-size: 14px;
+      }
+
+      footer {
+        flex-direction: column;
+        gap: 12px;
+        text-align: center;
+      }
+    }
+  </style>
 </head>
+
 <body>
 
-<!-- NAV -->
-<nav>
-  <div class="nav-logo">LLM.LEARN</div>
-  <div class="nav-links">
-    <a href="#what">What is LLM</a>
-    <a href="#how">How it Works</a>
-    <a href="#history">History</a>
-    <a href="#rag">RAG Systems</a>
-    <a href="#quiz">Quiz</a>
-  </div>
-</nav>
-<div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
-
-<!-- HERO -->
-<div class="hero">
-  <div class="hero-bg"></div>
-  <canvas class="neural-canvas" id="neuralCanvas"></canvas>
-  <div class="hero-content">
-    <div class="hero-tag">Data Science Course · Module 12</div>
-    <h1>Large Language<br>Models</h1>
-    <p class="hero-sub">From simple word prediction to world-changing AI — understand the intelligence behind the words, interactively.</p>
-    <div class="hero-ctas">
-      <a href="#what" class="btn btn-primary">Start Learning</a>
-      <a href="#quiz" class="btn btn-ghost">Take the Quiz</a>
-    </div>
-    <div class="hero-stats">
-      <div class="stat"><div class="stat-n">175B+</div><div class="stat-l">Parameters in GPT-3</div></div>
-      <div class="stat"><div class="stat-n">5</div><div class="stat-l">Sections to Master</div></div>
-      <div class="stat"><div class="stat-n">2017</div><div class="stat-l">Year Transformers Changed Everything</div></div>
-    </div>
-  </div>
-</div>
-
-<div class="divider"></div>
-
-<!-- ── SECTION 1: WHAT IS AN LLM ── -->
-<section id="what">
-  <p class="section-tag">Section 01 · Foundation</p>
-  <h2>What is a Large<br>Language Model?</h2>
-  <p class="section-lead">A Large Language Model is an AI system trained on massive text datasets to understand and generate human language — by learning to predict the next word, it learns everything.</p>
-
-  <div class="definition-grid">
-    <div class="def-card">
-      <div class="def-icon">🧠</div>
-      <h3>Deep Learning Core</h3>
-      <p>LLMs are powered by transformer neural networks with billions of tunable parameters (weights). These parameters capture statistical patterns across language.</p>
-    </div>
-    <div class="def-card">
-      <div class="def-icon">📚</div>
-      <h3>Trained on Massive Text</h3>
-      <p>Training data includes the web, books, Wikipedia, code, and more — often hundreds of billions of tokens of text. More data = richer understanding.</p>
-    </div>
-    <div class="def-card">
-      <div class="def-icon">🎯</div>
-      <h3>Next-Token Prediction</h3>
-      <p>The simple training objective: given previous words, predict the next one. Repeated billions of times, this teaches grammar, facts, reasoning, and creativity.</p>
-    </div>
-    <div class="def-card">
-      <div class="def-icon">🔀</div>
-      <h3>Zero-Shot Versatility</h3>
-      <p>One LLM can translate, summarize, write code, answer questions, and more — without being explicitly trained for each task. Just prompt it.</p>
-    </div>
-  </div>
-
-  <div class="interactive-box">
-    <h3>🔬 LLMs vs Traditional ML — Key Differences</h3>
-    <p class="hint">Hover over rows to highlight</p>
-    <table class="compare-table">
-      <thead>
-        <tr>
-          <th>Feature</th>
-          <th>Traditional ML</th>
-          <th>Large Language Models</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr><td>Input Type</td><td>Structured data (numbers, categories)</td><td>Natural language text</td></tr>
-        <tr><td>Training Scope</td><td>Task-specific</td><td>General-purpose pretraining</td></tr>
-        <tr><td>Parameters</td><td><span class="badge badge-blue">Thousands–Millions</span></td><td><span class="badge badge-purple">Billions–Trillions</span></td></tr>
-        <tr><td>Adaptability</td><td>Retrain for each new task</td><td>Prompt it — no retraining needed</td></tr>
-        <tr><td>Knowledge</td><td>Feature-engineered by humans</td><td>Implicit in word embeddings</td></tr>
-        <tr><td>Example</td><td>Linear Regression, Random Forest</td><td>GPT-4, Claude, Gemini</td></tr>
-      </tbody>
-    </table>
-  </div>
-
-  <div class="info-block">
-    <h4>💡 Where are LLMs Used Today?</h4>
-    <div class="tag-row">
-      <span class="chip">Customer Support Bots</span>
-      <span class="chip purple">Code Generation</span>
-      <span class="chip green">Medical Documentation</span>
-      <span class="chip">Content Creation</span>
-      <span class="chip purple">Language Translation</span>
-      <span class="chip green">Research Summarization</span>
-      <span class="chip">AI Tutors</span>
-      <span class="chip purple">Fraud Detection</span>
-    </div>
-  </div>
-</section>
-
-<div class="divider"></div>
-
-<!-- ── SECTION 2: HOW LLMs WORK ── -->
-<section id="how">
-  <p class="section-tag">Section 02 · Under the Hood</p>
-  <h2>How LLMs Actually Work</h2>
-  <p class="section-lead">Four key steps: Tokenize text → Embed tokens → Process through transformer layers → Generate output. Let's explore each interactively.</p>
-
-  <!-- TOKENIZER DEMO -->
-  <div class="interactive-box">
-    <h3>⚡ Live Tokenizer</h3>
-    <p class="hint">Type anything below — watch how the LLM splits it into tokens</p>
-    <input class="demo-input" type="text" id="tokenizerInput" placeholder="Type a sentence... e.g. 'Large language models are fascinating'" value="Large language models are fascinating">
-    <div class="token-display" id="tokenDisplay"></div>
-    <div class="token-stats">
-      <div class="token-stat">Tokens: <span id="tokenCount">0</span></div>
-      <div class="token-stat">Characters: <span id="charCount">0</span></div>
-      <div class="token-stat">Estimated cost: <span id="costEst">~$0.000</span></div>
-    </div>
-  </div>
-
-  <!-- TRANSFORMER ARCHITECTURE -->
-  <div class="two-col" style="margin-bottom:48px;">
-    <div>
-      <h3 style="font-family:'Syne',sans-serif;font-size:24px;font-weight:700;margin-bottom:16px;">The Transformer Pipeline</h3>
-      <p style="color:var(--text-dim);font-size:15px;line-height:1.8;margin-bottom:24px;">Click each step to learn more about what's happening inside the model.</p>
-      <div class="arch-flow" id="archFlow">
-        <div class="arch-step" onclick="toggleArch(this)">
-          <div class="arch-num">01</div>
-          <div class="arch-card">
-            <h4>🔡 Tokenization</h4>
-            <p>Text is split into subword tokens. "Fascinating" → ["Fas", "cin", "ating"]</p>
-            <div class="arch-detail">Each word becomes 1-4 tokens. Token IDs are mapped to integers. GPT-4 uses ~100K token vocabulary with Byte-Pair Encoding (BPE).</div>
-          </div>
-        </div>
-        <div style="padding-left:60px;"><div class="arch-connector"></div></div>
-        <div class="arch-step" onclick="toggleArch(this)">
-          <div class="arch-num">02</div>
-          <div class="arch-card">
-            <h4>🗺️ Embedding Layer</h4>
-            <p>Each token ID is converted to a dense vector (e.g. 768 or 4096 numbers)</p>
-            <div class="arch-detail">Embeddings encode semantic meaning. Similar words have similar vectors. Positional encodings are added to preserve word order.</div>
-          </div>
-        </div>
-        <div style="padding-left:60px;"><div class="arch-connector"></div></div>
-        <div class="arch-step" onclick="toggleArch(this)">
-          <div class="arch-num">03</div>
-          <div class="arch-card">
-            <h4>👁️ Self-Attention</h4>
-            <p>Each token "attends" to every other token, weighing their relevance</p>
-            <div class="arch-detail">For "The cat sat on it", the model learns that "it" attends strongly to "cat". Multi-head attention runs this in parallel with different perspectives.</div>
-          </div>
-        </div>
-        <div style="padding-left:60px;"><div class="arch-connector"></div></div>
-        <div class="arch-step" onclick="toggleArch(this)">
-          <div class="arch-num">04</div>
-          <div class="arch-card">
-            <h4>🔁 Repeat × N Layers</h4>
-            <p>Attention + feedforward networks are stacked 12–96 times</p>
-            <div class="arch-detail">GPT-3 has 96 transformer layers. Each layer refines the representation. Deeper layers capture abstract semantics; shallow layers capture syntax.</div>
-          </div>
-        </div>
-        <div style="padding-left:60px;"><div class="arch-connector"></div></div>
-        <div class="arch-step" onclick="toggleArch(this)">
-          <div class="arch-num">05</div>
-          <div class="arch-card">
-            <h4>📊 Output Head</h4>
-            <p>A softmax layer outputs probabilities over the entire vocabulary</p>
-            <div class="arch-detail">The highest probability token is chosen (greedy) or sampled (top-k/top-p). This one token is appended and the process repeats until done.</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ATTENTION VIZ -->
-    <div>
-      <h3 style="font-family:'Syne',sans-serif;font-size:24px;font-weight:700;margin-bottom:16px;">🔍 Attention Visualizer</h3>
-      <p style="color:var(--text-dim);font-size:15px;line-height:1.8;margin-bottom:24px;">Click a word to see which other words it "attends to" most strongly.</p>
-      <div class="attention-demo">
-        <p class="attn-label">CLICK A WORD TO SEE ATTENTION</p>
-        <div class="attn-sentence" id="attnSentence"></div>
-        <p class="attn-label">ATTENTION WEIGHTS → (brighter = stronger attention)</p>
-        <div class="attn-heatmap" id="attnHeatmap"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- TOKEN PREDICTOR -->
-  <div class="predictor-box">
-    <h3 style="font-family:'Syne',sans-serif;font-size:22px;font-weight:700;margin-bottom:8px;">🎲 Token Predictor — How Generation Works</h3>
-    <p class="hint" style="color:var(--text-muted);font-size:14px;margin-bottom:24px;">Click a predicted token to add it to the sequence — exactly how LLMs generate text one step at a time</p>
-    <div class="predictor-display" id="predictorDisplay"></div>
-    <p class="attn-label" style="margin-bottom:12px;">NEXT TOKEN CANDIDATES (with probability):</p>
-    <div class="predictions-list" id="predictionsList"></div>
-    <div style="display:flex;gap:12px;">
-      <button class="btn btn-ghost" onclick="resetPredictor()" style="font-size:14px;padding:10px 20px;">↺ Reset</button>
-      <button class="btn btn-primary" onclick="autoGenerate()" style="font-size:14px;padding:10px 20px;">▶ Auto Generate</button>
-    </div>
-  </div>
-</section>
-
-<div class="divider"></div>
-
-<!-- ── SECTION 3: HISTORY ── -->
-<section id="history">
-  <p class="section-tag">Section 03 · Evolution</p>
-  <h2>A Brief History<br>of LLMs</h2>
-  <p class="section-lead">From n-grams that memorized word pairs to trillion-parameter models — the journey is one of relentless scale, architecture, and data.</p>
-
-  <div class="timeline" id="timeline">
-    <div class="timeline-line"></div>
-
-    <div class="timeline-item">
-      <div class="timeline-year">Pre-2012</div>
-      <div class="timeline-dot"></div>
-      <div class="timeline-content">
-        <div class="timeline-model">Early NLP Era</div>
-        <p class="timeline-desc">Rule-based systems and statistical models (n-grams, TF-IDF) dominated. They could classify text but couldn't capture deep meaning or generate fluent language.</p>
-        <div class="timeline-badge"><span class="chip">Rule-Based</span> <span class="chip purple">N-Grams</span></div>
-      </div>
-    </div>
-
-    <div class="timeline-item">
-      <div class="timeline-year">2013</div>
-      <div class="timeline-dot"></div>
-      <div class="timeline-content">
-        <div class="timeline-model">Word2Vec — Google</div>
-        <p class="timeline-desc">Tomas Mikolov's Word2Vec mapped words to continuous vectors. King – Man + Woman ≈ Queen. The era of word embeddings began, allowing semantic relationships.</p>
-        <div class="timeline-badge"><span class="chip green">Word Embeddings</span></div>
-      </div>
-    </div>
-
-    <div class="timeline-item">
-      <div class="timeline-year">2017</div>
-      <div class="timeline-dot"></div>
-      <div class="timeline-content">
-        <div class="timeline-model">Transformers — "Attention Is All You Need"</div>
-        <p class="timeline-desc">Google Brain's landmark paper introduced the Transformer architecture with self-attention. It eliminated RNNs and enabled massive parallelization — the foundation for everything modern.</p>
-        <div class="timeline-badge"><span class="chip">Self-Attention</span> <span class="chip purple">Parallelization</span></div>
-      </div>
-    </div>
-
-    <div class="timeline-item">
-      <div class="timeline-year">2018</div>
-      <div class="timeline-dot"></div>
-      <div class="timeline-content">
-        <div class="timeline-model">BERT + GPT-1</div>
-        <p class="timeline-desc">BERT (Google) used bidirectional context for understanding tasks. GPT-1 (OpenAI) used unidirectional generation. Both proved pretraining + finetuning worked powerfully.</p>
-        <div class="timeline-badge"><span class="chip green">Bidirectional BERT</span> <span class="chip purple">GPT Generation</span></div>
-      </div>
-    </div>
-
-    <div class="timeline-item">
-      <div class="timeline-year">2020</div>
-      <div class="timeline-dot"></div>
-      <div class="timeline-content">
-        <div class="timeline-model">GPT-3 — 175 Billion Parameters</div>
-        <p class="timeline-desc">OpenAI's GPT-3 shocked the world with few-shot learning — it could do tasks it was never trained on, just from a few examples in the prompt. Scale proved to be the answer.</p>
-        <div class="timeline-badge"><span class="chip">175B Params</span> <span class="chip purple">Few-Shot</span></div>
-      </div>
-    </div>
-
-    <div class="timeline-item">
-      <div class="timeline-year">2022–23</div>
-      <div class="timeline-dot"></div>
-      <div class="timeline-content">
-        <div class="timeline-model">ChatGPT · Claude · Gemini · LLaMA</div>
-        <p class="timeline-desc">RLHF (Reinforcement Learning from Human Feedback) made models safe, helpful, and conversational. The public AI era began. Open-source models like LLaMA democratized access.</p>
-        <div class="timeline-badge"><span class="chip green">RLHF</span> <span class="chip">Open Source</span> <span class="chip purple">Conversational</span></div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<div class="divider"></div>
-
-<!-- ── SECTION 4: RAG ── -->
-<section id="rag">
-  <p class="section-tag">Section 04 · Advanced Architecture</p>
-  <h2>RAG — Retrieval-Augmented<br>Generation</h2>
-  <p class="section-lead">LLMs know only what was in their training data. RAG connects them to live, external knowledge — making them more accurate and current.</p>
-
-  <!-- RAG FLOW DIAGRAM -->
-  <div class="rag-flow">
-    <div class="rag-node">
-      <div class="rag-icon">👤</div>
-      <div class="rag-label">User Query</div>
-      <div class="rag-desc">"What's our return policy?"</div>
-    </div>
-    <div class="rag-arrow">→</div>
-    <div class="rag-node">
-      <div class="rag-icon">🔍</div>
-      <div class="rag-label">Retriever</div>
-      <div class="rag-desc">Searches vector DB for relevant docs</div>
-    </div>
-    <div class="rag-arrow">→</div>
-    <div class="rag-node">
-      <div class="rag-icon">📄</div>
-      <div class="rag-label">Context</div>
-      <div class="rag-desc">Top-k relevant chunks retrieved</div>
-    </div>
-    <div class="rag-arrow">→</div>
-    <div class="rag-node">
-      <div class="rag-icon">🤖</div>
-      <div class="rag-label">LLM Generator</div>
-      <div class="rag-desc">Generates answer using context + prompt</div>
-    </div>
-    <div class="rag-arrow">→</div>
-    <div class="rag-node">
-      <div class="rag-icon">✅</div>
-      <div class="rag-label">Grounded Answer</div>
-      <div class="rag-desc">Accurate, cited, up-to-date response</div>
-    </div>
-  </div>
-
-  <!-- PROBLEMS RAG SOLVES -->
-  <h3 style="font-family:'Syne',sans-serif;font-size:22px;font-weight:700;margin-bottom:20px;">Problems RAG Solves</h3>
-  <div class="rag-problem-cards" style="margin-bottom:48px;">
-    <div class="rag-problem">
-      <div class="prob-icon">🌀</div>
-      <div>
-        <div class="prob-title">Hallucination</div>
-        <p class="prob-text">LLMs confidently generate false facts because they're guessing from training patterns.</p>
-        <p class="prob-sol">✓ RAG anchors answers in real retrieved documents</p>
-      </div>
-    </div>
-    <div class="rag-problem">
-      <div class="prob-icon">📅</div>
-      <div>
-        <div class="prob-title">Outdated Knowledge</div>
-        <p class="prob-text">Training data has a cutoff date. Events after that are unknown to the model.</p>
-        <p class="prob-sol">✓ RAG fetches fresh data from live databases</p>
-      </div>
-    </div>
-    <div class="rag-problem">
-      <div class="prob-icon">🏢</div>
-      <div>
-        <div class="prob-title">Domain-Specific Needs</div>
-        <p class="prob-text">LLMs don't know your company's internal docs, policies, or proprietary data.</p>
-        <p class="prob-sol">✓ RAG connects to private corpora and PDFs</p>
-      </div>
-    </div>
-    <div class="rag-problem">
-      <div class="prob-icon">📦</div>
-      <div>
-        <div class="prob-title">Context Window Limits</div>
-        <p class="prob-text">You can't stuff an entire database into a prompt — context windows are finite.</p>
-        <p class="prob-sol">✓ RAG dynamically injects only the most relevant info</p>
-      </div>
-    </div>
-  </div>
-
-  <div class="info-block">
-    <h4>🛠️ RAG Pipeline Components</h4>
-    <ul>
-      <li><strong>Embedding Model</strong> — Converts text into dense vectors (e.g. sentence-transformers, OpenAI ada)</li>
-      <li><strong>Vector Store</strong> — Stores and indexes embeddings for fast similarity search (FAISS, Pinecone, Weaviate)</li>
-      <li><strong>Retriever</strong> — Searches vector store for top-k semantically similar chunks to the query</li>
-      <li><strong>LLM Generator</strong> — Uses retrieved context + user query to generate a grounded, cited response</li>
-      <li><strong>Reranker (Optional)</strong> — Reorders retrieved results for higher relevance before passing to LLM</li>
-    </ul>
-  </div>
-</section>
-
-<div class="divider"></div>
-
-<!-- ── SECTION 5: LIMITATIONS ── -->
-<section>
-  <p class="section-tag">Section 05 · Critical Thinking</p>
-  <h2>Limitations of LLMs</h2>
-  <p class="section-lead">LLMs are powerful but imperfect. A good data scientist understands the failure modes.</p>
-
-  <div class="limit-grid">
-    <div class="limit-card">
-      <div class="limit-icon">🌀</div>
-      <div class="limit-title">Hallucination</div>
-      <p class="limit-text">Models generate plausible-sounding but completely false information with full confidence.</p>
-    </div>
-    <div class="limit-card">
-      <div class="limit-icon">⚖️</div>
-      <div class="limit-title">Bias</div>
-      <p class="limit-text">Trained on internet text, LLMs inherit societal biases, stereotypes, and skewed viewpoints.</p>
-    </div>
-    <div class="limit-card">
-      <div class="limit-icon">🧩</div>
-      <div class="limit-title">No True Understanding</div>
-      <p class="limit-text">They learn statistical patterns, not meaning. They can fail spectacularly on simple reasoning.</p>
-    </div>
-    <div class="limit-card">
-      <div class="limit-icon">💸</div>
-      <div class="limit-title">Compute Cost</div>
-      <p class="limit-text">Training GPT-3 cost ~$4.6M. Running inference at scale requires expensive GPU clusters.</p>
-    </div>
-  </div>
-</section>
-
-<div class="divider"></div>
-
-<!-- ── GLOSSARY ── -->
-<section>
-  <p class="section-tag">Reference · Glossary</p>
-  <h2>Key Terms to Know</h2>
-  <div class="glossary-grid">
-    <div class="gloss-item">
-      <div class="gloss-term">TOKEN</div>
-      <div class="gloss-def">The basic unit of text an LLM processes. Can be a word, subword, or character. ~1 token ≈ 0.75 words in English.</div>
-    </div>
-    <div class="gloss-item">
-      <div class="gloss-term">EMBEDDING</div>
-      <div class="gloss-def">A numerical vector representation of a token. Captures semantic meaning so similar words have similar vectors in high-dimensional space.</div>
-    </div>
-    <div class="gloss-item">
-      <div class="gloss-term">SELF-ATTENTION</div>
-      <div class="gloss-def">A mechanism where each token weighs its relevance to all other tokens in the sequence, allowing context-aware processing.</div>
-    </div>
-    <div class="gloss-item">
-      <div class="gloss-term">TRANSFORMER</div>
-      <div class="gloss-def">The neural network architecture (2017) at the core of all modern LLMs. Uses self-attention and feedforward layers stacked in sequence.</div>
-    </div>
-    <div class="gloss-item">
-      <div class="gloss-term">PRETRAINING</div>
-      <div class="gloss-def">Initial training on massive text data using next-token prediction. Gives the model broad language understanding before finetuning.</div>
-    </div>
-    <div class="gloss-item">
-      <div class="gloss-term">RLHF</div>
-      <div class="gloss-def">Reinforcement Learning from Human Feedback. Used to align models to be helpful, harmless, and honest (ChatGPT, Claude).</div>
-    </div>
-    <div class="gloss-item">
-      <div class="gloss-term">RAG</div>
-      <div class="gloss-def">Retrieval-Augmented Generation. Combines a retriever (finds relevant docs) with an LLM (generates grounded answers).</div>
-    </div>
-    <div class="gloss-item">
-      <div class="gloss-term">HALLUCINATION</div>
-      <div class="gloss-def">When an LLM generates confident, fluent, but factually incorrect content. A key limitation of current models.</div>
-    </div>
-    <div class="gloss-item">
-      <div class="gloss-term">CONTEXT WINDOW</div>
-      <div class="gloss-def">The maximum number of tokens an LLM can process at once. GPT-4 Turbo supports 128K tokens (~300 pages).</div>
-    </div>
-    <div class="gloss-item">
-      <div class="gloss-term">TOP-K / TOP-P SAMPLING</div>
-      <div class="gloss-def">Sampling strategies for token selection. Top-k picks from the k most likely tokens; top-p picks from tokens summing to probability p.</div>
-    </div>
-  </div>
-</section>
-
-<div class="divider"></div>
-
-<!-- ── QUIZ ── -->
-<section id="quiz">
-  <p class="section-tag">Section 06 · Test Yourself</p>
-  <h2>Knowledge Check</h2>
-  <p class="section-lead">Answer these questions to solidify your understanding of LLMs.</p>
-
-  <!-- Q1 -->
-  <div class="quiz-card">
-    <div class="quiz-question">Q1. What is the core training objective of a Large Language Model?</div>
-    <div class="quiz-options">
-      <button class="quiz-opt" onclick="answer(this, false, 'q1')">A. Classify images into categories</button>
-      <button class="quiz-opt" onclick="answer(this, true, 'q1')">B. Predict the next token given previous tokens</button>
-      <button class="quiz-opt" onclick="answer(this, false, 'q1')">C. Find the shortest path in a graph</button>
-      <button class="quiz-opt" onclick="answer(this, false, 'q1')">D. Minimize reconstruction error in autoencoders</button>
-    </div>
-    <div class="quiz-feedback" id="q1-fb"></div>
-  </div>
-
-  <!-- Q2 -->
-  <div class="quiz-card">
-    <div class="quiz-question">Q2. Which architecture paper in 2017 revolutionized NLP and became the foundation for LLMs?</div>
-    <div class="quiz-options">
-      <button class="quiz-opt" onclick="answer(this, false, 'q2')">A. ImageNet Classification with Deep Convolutional Neural Networks</button>
-      <button class="quiz-opt" onclick="answer(this, false, 'q2')">B. Playing Atari with Deep Reinforcement Learning</button>
-      <button class="quiz-opt" onclick="answer(this, true, 'q2')">C. Attention Is All You Need (Vaswani et al.)</button>
-      <button class="quiz-opt" onclick="answer(this, false, 'q2')">D. Generative Adversarial Nets</button>
-    </div>
-    <div class="quiz-feedback" id="q2-fb"></div>
-  </div>
-
-  <!-- Q3 -->
-  <div class="quiz-card">
-    <div class="quiz-question">Q3. What does "hallucination" mean in the context of LLMs?</div>
-    <div class="quiz-options">
-      <button class="quiz-opt" onclick="answer(this, false, 'q3')">A. The model crashes and shows visual errors</button>
-      <button class="quiz-opt" onclick="answer(this, false, 'q3')">B. The model refuses to answer questions</button>
-      <button class="quiz-opt" onclick="answer(this, true, 'q3')">C. The model confidently generates plausible but factually wrong information</button>
-      <button class="quiz-opt" onclick="answer(this, false, 'q3')">D. The model outputs random tokens with no pattern</button>
-    </div>
-    <div class="quiz-feedback" id="q3-fb"></div>
-  </div>
-
-  <!-- Q4 -->
-  <div class="quiz-card">
-    <div class="quiz-question">Q4. In a RAG system, what is the role of the "Vector Store"?</div>
-    <div class="quiz-options">
-      <button class="quiz-opt" onclick="answer(this, false, 'q4')">A. Stores the LLM's model weights</button>
-      <button class="quiz-opt" onclick="answer(this, true, 'q4')">B. Stores embedded document chunks for fast similarity search</button>
-      <button class="quiz-opt" onclick="answer(this, false, 'q4')">C. Converts natural language to SQL queries</button>
-      <button class="quiz-opt" onclick="answer(this, false, 'q4')">D. Trains the LLM on new data</button>
-    </div>
-    <div class="quiz-feedback" id="q4-fb"></div>
-  </div>
-
-  <!-- Q5 -->
-  <div class="quiz-card">
-    <div class="quiz-question">Q5. What does RLHF stand for, and why is it used?</div>
-    <div class="quiz-options">
-      <button class="quiz-opt" onclick="answer(this, false, 'q5')">A. Recursive Language History Framework — to store conversation history</button>
-      <button class="quiz-opt" onclick="answer(this, false, 'q5')">B. Random Layer Hyperparameter Fixing — to tune model architecture</button>
-      <button class="quiz-opt" onclick="answer(this, true, 'q5')">C. Reinforcement Learning from Human Feedback — to align models to be helpful and safe</button>
-      <button class="quiz-opt" onclick="answer(this, false, 'q5')">D. Rapid Language Hallucination Filter — to remove incorrect outputs</button>
-    </div>
-    <div class="quiz-feedback" id="q5-fb"></div>
-  </div>
-
-  <div id="quizResults" style="display:none; margin-top:24px; padding:32px; background:var(--panel); border:1px solid var(--border); border-radius:16px; text-align:center;">
-    <div style="font-size:48px; margin-bottom:16px;" id="resultsEmoji">🎉</div>
-    <h3 style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800;margin-bottom:8px;" id="resultsTitle">Well Done!</h3>
-    <p style="color:var(--text-dim);font-size:16px;" id="resultsText">You scored 0/5</p>
-  </div>
-</section>
-
-<!-- SUMMARY BANNER -->
-<div style="padding:0 40px 100px;max-width:1100px;margin:0 auto;">
-  <div class="summary-banner">
-    <h2>You've Covered the Essentials of LLMs</h2>
-    <p>From tokenization and transformers to RAG systems and limitations — you now have a solid foundation to build on. The next step is building with LLMs in Python using the Anthropic or OpenAI APIs.</p>
-    <a href="#what" class="btn btn-primary">Review Again ↑</a>
-  </div>
-</div>
-
-<footer>
-  <div>Data Science Handbook — <span>Module 12: LLMs</span></div>
-  <div>Built for interactive learning · 2025</div>
-</footer>
-
-<script>
-// ─── PROGRESS BAR ───
-window.addEventListener('scroll', () => {
-  const pct = (window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100;
-  document.getElementById('progressFill').style.width = pct + '%';
-});
-
-// ─── NEURAL CANVAS ANIMATION ───
-const canvas = document.getElementById('neuralCanvas');
-const ctx = canvas.getContext('2d');
-let nodes = [], W, H;
-function resizeCanvas() {
-  W = canvas.width = canvas.offsetWidth;
-  H = canvas.height = canvas.offsetHeight;
-}
-function initNodes() {
-  nodes = Array.from({length: 60}, () => ({
-    x: Math.random()*W, y: Math.random()*H,
-    vx: (Math.random()-.5)*0.4, vy: (Math.random()-.5)*0.4,
-    r: Math.random()*2+1
-  }));
-}
-function drawCanvas() {
-  ctx.clearRect(0,0,W,H);
-  nodes.forEach(n => {
-    n.x += n.vx; n.y += n.vy;
-    if(n.x<0||n.x>W) n.vx*=-1;
-    if(n.y<0||n.y>H) n.vy*=-1;
-    ctx.beginPath(); ctx.arc(n.x,n.y,n.r,0,Math.PI*2);
-    ctx.fillStyle='rgba(0,212,255,0.5)'; ctx.fill();
-  });
-  nodes.forEach((a,i) => nodes.slice(i+1).forEach(b => {
-    const d = Math.hypot(a.x-b.x, a.y-b.y);
-    if(d < 120) {
-      ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y);
-      ctx.strokeStyle=`rgba(0,212,255,${0.15*(1-d/120)})`; ctx.lineWidth=1; ctx.stroke();
+  <!-- ===== GLOBAL NAVBAR START ===== -->
+  <style>
+    /* ---------- NAVBAR VARIABLES ---------- */
+    :root {
+      --nb-glass: rgba(255, 255, 255, 0.18);
+      --nb-glass-active: rgba(255, 255, 255, 0.92);
+      --nb-border: rgba(255, 255, 255, 0.35);
+      --nb-shadow: 0 8px 32px rgba(0, 0, 0, 0.18), 0 1.5px 8px rgba(0, 0, 0, 0.10);
+      --nb-text: rgba(255, 255, 255, 0.85);
+      --nb-text-active: #1a1a2e;
+      --nb-radius: 999px;
+      --nb-arrow-size: 52px;
     }
-  }));
-  requestAnimationFrame(drawCanvas);
-}
-resizeCanvas(); initNodes(); drawCanvas();
-window.addEventListener('resize', ()=>{resizeCanvas(); initNodes();});
 
-// ─── TOKENIZER ───
-const tokenColors = [
-  {bg:'rgba(0,212,255,0.12)',border:'rgba(0,212,255,0.4)',text:'#00d4ff'},
-  {bg:'rgba(124,58,237,0.12)',border:'rgba(124,58,237,0.4)',text:'#a78bfa'},
-  {bg:'rgba(16,185,129,0.12)',border:'rgba(16,185,129,0.4)',text:'#10b981'},
-  {bg:'rgba(245,158,11,0.12)',border:'rgba(245,158,11,0.4)',text:'#f59e0b'},
-  {bg:'rgba(239,68,68,0.12)',border:'rgba(239,68,68,0.4)',text:'#f87171'},
-];
-function tokenize(text) {
-  if(!text.trim()) return [];
-  const tokens = [];
-  let i = 0;
-  while(i < text.length) {
-    if(text[i] === ' ') { tokens.push(' '); i++; continue; }
-    // Simple BPE-like simulation
-    const remainLen = Math.min(Math.floor(Math.random()*4)+2, text.length-i);
-    tokens.push(text.slice(i, i+remainLen));
-    i += remainLen;
-  }
-  return tokens.filter(t => t !== ' ');
-}
-function renderTokens() {
-  const input = document.getElementById('tokenizerInput').value;
-  const display = document.getElementById('tokenDisplay');
-  const tokens = tokenize(input);
-  display.innerHTML = '';
-  tokens.forEach((t, i) => {
-    const c = tokenColors[i % tokenColors.length];
-    const el = document.createElement('span');
-    el.className = 'token';
-    el.textContent = t.replace(/ /g,'·');
-    el.style.cssText = `background:${c.bg};border-color:${c.border};color:${c.text}`;
-    display.appendChild(el);
-  });
-  document.getElementById('tokenCount').textContent = tokens.length;
-  document.getElementById('charCount').textContent = input.length;
-  document.getElementById('costEst').textContent = `~$${(tokens.length * 0.000002).toFixed(6)}`;
-}
-document.getElementById('tokenizerInput').addEventListener('input', renderTokens);
-renderTokens();
-
-// ─── TRANSFORMER STEPS ───
-function toggleArch(el) {
-  el.classList.toggle('active');
-}
-
-// ─── ATTENTION VISUALIZER ───
-const attnSentence = ['The', 'cat', 'sat', 'on', 'the', 'mat', 'because', 'it', 'was', 'tired'];
-const attnWeights = {
-  'The':     [0.8, 0.1, 0.1, 0.05, 0.6, 0.05, 0.1, 0.1, 0.05, 0.05],
-  'cat':     [0.2, 0.9, 0.3, 0.1, 0.1, 0.2, 0.3, 0.7, 0.2, 0.4],
-  'sat':     [0.1, 0.5, 0.9, 0.4, 0.1, 0.6, 0.2, 0.3, 0.3, 0.2],
-  'on':      [0.05, 0.1, 0.4, 0.9, 0.2, 0.7, 0.1, 0.1, 0.1, 0.1],
-  'the':     [0.7, 0.1, 0.1, 0.2, 0.9, 0.5, 0.1, 0.1, 0.1, 0.1],
-  'mat':     [0.1, 0.2, 0.6, 0.7, 0.4, 0.9, 0.1, 0.2, 0.1, 0.3],
-  'because': [0.05, 0.3, 0.2, 0.1, 0.05, 0.1, 0.9, 0.6, 0.4, 0.5],
-  'it':      [0.1, 0.8, 0.3, 0.1, 0.2, 0.3, 0.5, 0.9, 0.3, 0.6],
-  'was':     [0.05, 0.2, 0.3, 0.1, 0.1, 0.1, 0.4, 0.5, 0.9, 0.7],
-  'tired':   [0.05, 0.4, 0.2, 0.1, 0.1, 0.3, 0.5, 0.6, 0.7, 0.9],
-};
-const sentEl = document.getElementById('attnSentence');
-const heatEl = document.getElementById('attnHeatmap');
-attnSentence.forEach(w => {
-  const el = document.createElement('span');
-  el.className = 'attn-word'; el.textContent = w;
-  el.onclick = () => showAttention(w, el);
-  sentEl.appendChild(el);
-});
-attnSentence.forEach(w => {
-  const el = document.createElement('span');
-  el.className = 'attn-cell'; el.textContent = w; el.id = 'heat-'+w;
-  heatEl.appendChild(el);
-});
-function showAttention(word, clickedEl) {
-  document.querySelectorAll('.attn-word').forEach(e => e.classList.remove('selected'));
-  clickedEl.classList.add('selected');
-  const weights = attnWeights[word];
-  attnSentence.forEach((w, i) => {
-    const heat = document.getElementById('heat-'+w);
-    const v = weights[i];
-    const r = Math.round(v * 220);
-    const g = Math.round(v * 100);
-    const b = Math.round(255 - v * 100);
-    heat.style.background = `rgba(${r},${g},${b},${0.1 + v*0.5})`;
-    heat.style.color = v > 0.5 ? '#fff' : 'var(--text-dim)';
-    heat.style.transform = `scale(${0.9 + v*0.2})`;
-    heat.style.fontWeight = v > 0.7 ? '700' : '400';
-  });
-}
-showAttention('it', document.querySelector('.attn-word:nth-child(8)'));
-
-// ─── TOKEN PREDICTOR ───
-const story = [
-  { text: "The transformer model was", predictions: [
-    {tok:"trained",pct:32},{tok:"designed",pct:28},{tok:"built",pct:18},{tok:"created",pct:14},{tok:"first",pct:8}
-  ]},
-  { text:"trained on billions of tokens from the", predictions:[
-    {tok:"internet",pct:38},{tok:"web",pct:27},{tok:"entire",pct:15},{tok:"largest",pct:12},{tok:"public",pct:8}
-  ]},
-  { text:"internet. It learns to predict the", predictions:[
-    {tok:"next",pct:55},{tok:"correct",pct:18},{tok:"most",pct:13},{tok:"following",pct:9},{tok:"best",pct:5}
-  ]},
-  { text:"next token at every position,", predictions:[
-    {tok:"which",pct:30},{tok:"allowing",pct:25},{tok:"enabling",pct:20},{tok:"and",pct:15},{tok:"making",pct:10}
-  ]},
-  { text:"enabling it to generate", predictions:[
-    {tok:"coherent",pct:35},{tok:"fluent",pct:28},{tok:"human-like",pct:22},{tok:"natural",pct:10},{tok:"rich",pct:5}
-  ]},
-  { text:"coherent and meaningful text.", predictions:[
-    {tok:"This",pct:40},{tok:"The",pct:30},{tok:"Through",pct:18},{tok:"Over",pct:8},{tok:"By",pct:4}
-  ]},
-];
-let predIdx = 0, autoTimer = null;
-function renderPredictor() {
-  const step = story[Math.min(predIdx, story.length-1)];
-  document.getElementById('predictorDisplay').innerHTML = step.text + ' <span class="cursor-blink"></span>';
-  const list = document.getElementById('predictionsList');
-  list.innerHTML = '';
-  step.predictions.forEach(p => {
-    const el = document.createElement('div');
-    el.className = 'pred-token';
-    el.innerHTML = `<span>${p.tok}</span><div class="pred-bar" style="width:${p.pct*1.5}px"></div><span class="pred-pct">${p.pct}%</span>`;
-    el.onclick = () => { selectToken(p.tok); };
-    list.appendChild(el);
-    setTimeout(() => el.querySelector('.pred-bar').style.width = (p.pct*1.5)+'px', 50);
-  });
-}
-function selectToken(tok) {
-  if(predIdx < story.length-1) predIdx++;
-  renderPredictor();
-}
-function resetPredictor() {
-  predIdx = 0; clearInterval(autoTimer); autoTimer=null; renderPredictor();
-  document.querySelector('[onclick="autoGenerate()"]').textContent = '▶ Auto Generate';
-}
-function autoGenerate() {
-  if(autoTimer) { clearInterval(autoTimer); autoTimer=null; document.querySelector('[onclick="autoGenerate()"]').textContent='▶ Auto Generate'; return; }
-  document.querySelector('[onclick="autoGenerate()"]').textContent='⏸ Pause';
-  autoTimer = setInterval(() => {
-    if(predIdx >= story.length-1) { clearInterval(autoTimer); autoTimer=null; document.querySelector('[onclick="autoGenerate()"]').textContent='▶ Auto Generate'; return; }
-    predIdx++; renderPredictor();
-  }, 1500);
-}
-renderPredictor();
-
-// ─── TIMELINE INTERSECTION OBSERVER ───
-const timelineItems = document.querySelectorAll('.timeline-item');
-const obs = new IntersectionObserver(entries => {
-  entries.forEach((e, i) => {
-    if(e.isIntersecting) {
-      setTimeout(() => e.target.classList.add('visible'), e.target.dataset.delay||0);
+    /* ---------- MAIN NAV WRAPPER ---------- */
+    .global-nav-wrapper {
+      position: fixed;
+      top: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 99999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: max-content;
+      max-width: calc(100vw - 140px);
     }
-  });
-}, {threshold: 0.2});
-timelineItems.forEach((item, i) => {
-  item.dataset.delay = i * 100;
-  obs.observe(item);
-});
 
-// ─── QUIZ ───
-const feedbacks = {
-  q1: {
-    correct: "✓ Correct! LLMs are trained using 'next token prediction' — given a sequence of tokens, predict what comes next. This simple objective, applied to massive datasets, teaches the model language, facts, and reasoning.",
-    wrong: "✗ Not quite. The core training objective is 'next token prediction' — the model learns by repeatedly trying to predict what word comes next in a sequence."
-  },
-  q2: {
-    correct: "✓ Correct! 'Attention Is All You Need' (Vaswani et al., 2017) introduced the Transformer architecture and the self-attention mechanism, which became the foundation for BERT, GPT, and every modern LLM.",
-    wrong: "✗ Not quite. The paper is 'Attention Is All You Need' by Vaswani et al. (2017), which introduced the Transformer architecture and self-attention mechanisms."
-  },
-  q3: {
-    correct: "✓ Correct! Hallucination is when an LLM generates text that sounds authoritative and fluent but contains factually wrong information — because the model is statistically predicting, not truly 'knowing'.",
-    wrong: "✗ Not quite. Hallucination refers to when LLMs confidently generate plausible-sounding but factually incorrect information."
-  },
-  q4: {
-    correct: "✓ Correct! The Vector Store (e.g., FAISS, Pinecone) stores embedded document chunks as dense vectors, enabling fast semantic similarity search when a user query comes in.",
-    wrong: "✗ Not quite. The Vector Store stores document embeddings (vector representations) for fast semantic similarity search during retrieval."
-  },
-  q5: {
-    correct: "✓ Correct! RLHF = Reinforcement Learning from Human Feedback. Human raters score model outputs, and the model is fine-tuned to produce more helpful, harmless, and honest responses. This is how ChatGPT and Claude were aligned.",
-    wrong: "✗ Not quite. RLHF stands for Reinforcement Learning from Human Feedback — a technique used to align LLMs to human values and make them safe and helpful."
-  }
-};
-let answers = {};
-function answer(btn, correct, qid) {
-  if(answers[qid] !== undefined) return;
-  answers[qid] = correct;
-  const opts = btn.parentNode.querySelectorAll('.quiz-opt');
-  opts.forEach(o => { o.style.pointerEvents='none'; });
-  btn.classList.add(correct ? 'correct' : 'wrong');
-  if(!correct) {
-    opts.forEach(o => { if(o.onclick.toString().includes('true')) o.classList.add('correct'); });
-  }
-  const fb = document.getElementById(qid+'-fb');
-  const info = feedbacks[qid];
-  fb.textContent = correct ? info.correct : info.wrong;
-  fb.className = `quiz-feedback show ${correct ? 'correct-fb' : 'wrong-fb'}`;
+    /* ---------- CURVED GLASS NAV BAR ---------- */
+    .global-navbar {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      background: var(--nb-glass);
+      backdrop-filter: blur(22px) saturate(180%);
+      -webkit-backdrop-filter: blur(22px) saturate(180%);
+      border: 1.5px solid var(--nb-border);
+      border-radius: var(--nb-radius);
+      padding: 5px 6px;
+      box-shadow: var(--nb-shadow);
+      position: relative;
+      transition: background 0.3s ease;
+    }
 
-  if(Object.keys(answers).length === 5) {
-    const score = Object.values(answers).filter(v=>v).length;
-    const res = document.getElementById('quizResults');
-    res.style.display = 'block';
-    document.getElementById('resultsEmoji').textContent = score>=4?'🏆':score>=3?'🎯':score>=2?'📚':'💪';
-    document.getElementById('resultsTitle').textContent = score===5?'Perfect Score!':score>=4?'Excellent!':score>=3?'Good Job!':'Keep Practicing!';
-    document.getElementById('resultsText').textContent = `You scored ${score}/5 — ${score===5?'You have mastered LLM fundamentals!':score>=3?'Solid understanding of LLMs!':'Review the sections above and try again!'}`;
-    res.scrollIntoView({behavior:'smooth', block:'center'});
-  }
-}
-</script>
+    .global-navbar:hover {
+      background: rgba(255, 255, 255, 0.24);
+    }
+
+    /* ---------- NAV LINKS ---------- */
+    .nav-link-custom {
+      display: flex;
+      align-items: center;
+      padding: 7px 15px;
+      border-radius: var(--nb-radius);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--nb-text) !important;
+      text-decoration: none !important;
+      letter-spacing: 0.01em;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      white-space: nowrap;
+      position: relative;
+      font-family: 'Outfit', 'Syne', 'DM Sans', system-ui, sans-serif;
+    }
+
+    .nav-link-custom:hover {
+      background: rgba(255, 255, 255, 0.22);
+      color: #fff !important;
+      transform: translateY(-1px);
+    }
+
+    /* ---------- ACTIVE STATE ---------- */
+    .nav-link-custom.nav-item-active {
+      background: rgba(255, 255, 255, 0.92) !important;
+      color: #1a1a2e !important;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.18), 0 1px 4px rgba(0, 0, 0, 0.10);
+      pointer-events: none;
+      font-weight: 700;
+    }
+
+    .nav-link-custom.nav-item-active::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.7);
+      display: none;
+    }
+
+    /* ---------- ARROW BUTTONS ---------- */
+    .nav-arrow {
+      position: fixed;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 99998;
+      width: var(--nb-arrow-size);
+      height: var(--nb-arrow-size);
+      border-radius: 50%;
+      background: var(--nb-glass);
+      backdrop-filter: blur(22px) saturate(180%);
+      -webkit-backdrop-filter: blur(22px) saturate(180%);
+      border: 1.5px solid var(--nb-border);
+      box-shadow: var(--nb-shadow);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none !important;
+      color: rgba(255, 255, 255, 0.92) !important;
+      font-size: 26px;
+      font-weight: 300;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      cursor: pointer;
+      overflow: visible;
+    }
+
+    .nav-arrow:hover {
+      background: rgba(255, 255, 255, 0.92);
+      color: #1a1a2e !important;
+      transform: translateY(-50%) scale(1.08);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.22), 0 2px 8px rgba(0, 0, 0, 0.14);
+    }
+
+    .nav-arrow-left {
+      left: 16px;
+    }
+
+    .nav-arrow-right {
+      right: 16px;
+    }
+
+    .arrow-icon {
+      line-height: 1;
+      font-style: normal;
+      font-family: Georgia, serif;
+      user-select: none;
+    }
+
+    /* ---------- ARROW TOOLTIPS ---------- */
+    .arrow-tooltip {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.92);
+      color: #1a1a2e;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 5px 11px;
+      border-radius: 999px;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.22s ease;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.14);
+      font-family: 'Outfit', 'Syne', system-ui, sans-serif;
+      transform: translateY(0px);
+    }
+
+    .nav-arrow-left .arrow-tooltip {
+      left: calc(100% + 10px);
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .nav-arrow-right .arrow-tooltip {
+      right: calc(100% + 10px);
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .nav-arrow:hover .arrow-tooltip {
+      opacity: 1;
+      transform: translateY(-50%);
+    }
+
+    /* ---------- PAGE BODY OFFSET ---------- */
+    body {
+      padding-top: 72px !important;
+    }
+
+    /* ---------- RESPONSIVE ---------- */
+    @media (max-width: 768px) {
+      .global-nav-wrapper {
+        max-width: calc(100vw - 100px);
+      }
+
+      .nav-link-custom {
+        padding: 6px 10px;
+        font-size: 11.5px;
+      }
+
+      :root {
+        --nb-arrow-size: 42px;
+      }
+
+      .nav-arrow {
+        font-size: 22px;
+      }
+
+      .nav-arrow-left {
+        left: 8px;
+      }
+
+      .nav-arrow-right {
+        right: 8px;
+      }
+
+      .arrow-tooltip {
+        display: none;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .nav-link-custom {
+        padding: 5px 7px;
+        font-size: 10.5px;
+      }
+    }
+  </style>
+
+  <a href="feature-importance.html" class="nav-arrow nav-arrow-left" title="Previous: ⭐ Feature Importance">
+    <span class="arrow-icon">‹</span>
+    <div class="arrow-tooltip">⭐ Feature Importance</div>
+  </a>
+  <a href="linkedin-guide.html" class="nav-arrow nav-arrow-right" title="Next: 💼 LinkedIn Guide">
+    <span class="arrow-icon">›</span>
+    <div class="arrow-tooltip">💼 LinkedIn Guide</div>
+  </a>
+
+  <div class="global-nav-wrapper">
+    <nav class="global-navbar">
+      <a href="kedar__profile.html" class="nav-link-custom " title="👤 Profile">👤 Profile</a>
+      <a href="data_collection.html" class="nav-link-custom " title="📊 Data Collection">📊 Data Collection</a>
+      <a href="Train-test-split.html" class="nav-link-custom " title="✂️ Train-Test Split">✂️ Train-Test Split</a>
+      <a href="ml-algorithms-intro.html" class="nav-link-custom " title="🤖 ML Algorithms">🤖 ML Algorithms</a>
+      <a href="feature-importance.html" class="nav-link-custom " title="⭐ Feature Importance">⭐ Feature Importance</a>
+      <a href="llm.html" class="nav-link-custom nav-item-active" title="🧠 LLMs">🧠 LLMs</a>
+      <a href="linkedin-guide.html" class="nav-link-custom " title="💼 LinkedIn Guide">💼 LinkedIn Guide</a>
+
+    </nav>
+  </div>
+  <!-- ===== GLOBAL NAVBAR END ===== -->
+
+
+  <!-- NAV -->
+  <nav>
+    <div class="nav-logo">LLM.LEARN</div>
+    <div class="nav-links">
+      <a href="#what">What is LLM</a>
+      <a href="#how">How it Works</a>
+      <a href="#history">History</a>
+      <a href="#rag">RAG Systems</a>
+      <a href="#quiz">Quiz</a>
+    </div>
+  </nav>
+  <div class="progress-bar">
+    <div class="progress-fill" id="progressFill"></div>
+  </div>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-bg"></div>
+    <canvas class="neural-canvas" id="neuralCanvas"></canvas>
+    <div class="hero-content">
+      <div class="hero-tag">Data Science Course · Module 12</div>
+      <h1>Large Language<br>Models</h1>
+      <p class="hero-sub">From simple word prediction to world-changing AI — understand the intelligence behind the
+        words, interactively.</p>
+      <div class="hero-ctas">
+        <a href="#what" class="btn btn-primary">Start Learning</a>
+        <a href="#quiz" class="btn btn-ghost">Take the Quiz</a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat">
+          <div class="stat-n">175B+</div>
+          <div class="stat-l">Parameters in GPT-3</div>
+        </div>
+        <div class="stat">
+          <div class="stat-n">5</div>
+          <div class="stat-l">Sections to Master</div>
+        </div>
+        <div class="stat">
+          <div class="stat-n">2017</div>
+          <div class="stat-l">Year Transformers Changed Everything</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ── SECTION 1: WHAT IS AN LLM ── -->
+  <section id="what">
+    <p class="section-tag">Section 01 · Foundation</p>
+    <h2>What is a Large<br>Language Model?</h2>
+    <p class="section-lead">A Large Language Model is an AI system trained on massive text datasets to understand and
+      generate human language — by learning to predict the next word, it learns everything.</p>
+
+    <div class="definition-grid">
+      <div class="def-card">
+        <div class="def-icon">🧠</div>
+        <h3>Deep Learning Core</h3>
+        <p>LLMs are powered by transformer neural networks with billions of tunable parameters (weights). These
+          parameters capture statistical patterns across language.</p>
+      </div>
+      <div class="def-card">
+        <div class="def-icon">📚</div>
+        <h3>Trained on Massive Text</h3>
+        <p>Training data includes the web, books, Wikipedia, code, and more — often hundreds of billions of tokens of
+          text. More data = richer understanding.</p>
+      </div>
+      <div class="def-card">
+        <div class="def-icon">🎯</div>
+        <h3>Next-Token Prediction</h3>
+        <p>The simple training objective: given previous words, predict the next one. Repeated billions of times, this
+          teaches grammar, facts, reasoning, and creativity.</p>
+      </div>
+      <div class="def-card">
+        <div class="def-icon">🔀</div>
+        <h3>Zero-Shot Versatility</h3>
+        <p>One LLM can translate, summarize, write code, answer questions, and more — without being explicitly trained
+          for each task. Just prompt it.</p>
+      </div>
+    </div>
+
+    <div class="interactive-box">
+      <h3>🔬 LLMs vs Traditional ML — Key Differences</h3>
+      <p class="hint">Hover over rows to highlight</p>
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th>Feature</th>
+            <th>Traditional ML</th>
+            <th>Large Language Models</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Input Type</td>
+            <td>Structured data (numbers, categories)</td>
+            <td>Natural language text</td>
+          </tr>
+          <tr>
+            <td>Training Scope</td>
+            <td>Task-specific</td>
+            <td>General-purpose pretraining</td>
+          </tr>
+          <tr>
+            <td>Parameters</td>
+            <td><span class="badge badge-blue">Thousands–Millions</span></td>
+            <td><span class="badge badge-purple">Billions–Trillions</span></td>
+          </tr>
+          <tr>
+            <td>Adaptability</td>
+            <td>Retrain for each new task</td>
+            <td>Prompt it — no retraining needed</td>
+          </tr>
+          <tr>
+            <td>Knowledge</td>
+            <td>Feature-engineered by humans</td>
+            <td>Implicit in word embeddings</td>
+          </tr>
+          <tr>
+            <td>Example</td>
+            <td>Linear Regression, Random Forest</td>
+            <td>GPT-4, Claude, Gemini</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="info-block">
+      <h4>💡 Where are LLMs Used Today?</h4>
+      <div class="tag-row">
+        <span class="chip">Customer Support Bots</span>
+        <span class="chip purple">Code Generation</span>
+        <span class="chip green">Medical Documentation</span>
+        <span class="chip">Content Creation</span>
+        <span class="chip purple">Language Translation</span>
+        <span class="chip green">Research Summarization</span>
+        <span class="chip">AI Tutors</span>
+        <span class="chip purple">Fraud Detection</span>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ── SECTION 2: HOW LLMs WORK ── -->
+  <section id="how">
+    <p class="section-tag">Section 02 · Under the Hood</p>
+    <h2>How LLMs Actually Work</h2>
+    <p class="section-lead">Four key steps: Tokenize text → Embed tokens → Process through transformer layers → Generate
+      output. Let's explore each interactively.</p>
+
+    <!-- TOKENIZER DEMO -->
+    <div class="interactive-box">
+      <h3>⚡ Live Tokenizer</h3>
+      <p class="hint">Type anything below — watch how the LLM splits it into tokens</p>
+      <input class="demo-input" type="text" id="tokenizerInput"
+        placeholder="Type a sentence... e.g. 'Large language models are fascinating'"
+        value="Large language models are fascinating">
+      <div class="token-display" id="tokenDisplay"></div>
+      <div class="token-stats">
+        <div class="token-stat">Tokens: <span id="tokenCount">0</span></div>
+        <div class="token-stat">Characters: <span id="charCount">0</span></div>
+        <div class="token-stat">Estimated cost: <span id="costEst">~$0.000</span></div>
+      </div>
+    </div>
+
+    <!-- TRANSFORMER ARCHITECTURE -->
+    <div class="two-col" style="margin-bottom:48px;">
+      <div>
+        <h3 style="font-family:'Syne',sans-serif;font-size:24px;font-weight:700;margin-bottom:16px;">The Transformer
+          Pipeline</h3>
+        <p style="color:var(--text-dim);font-size:15px;line-height:1.8;margin-bottom:24px;">Click each step to learn
+          more about what's happening inside the model.</p>
+        <div class="arch-flow" id="archFlow">
+          <div class="arch-step" onclick="toggleArch(this)">
+            <div class="arch-num">01</div>
+            <div class="arch-card">
+              <h4>🔡 Tokenization</h4>
+              <p>Text is split into subword tokens. "Fascinating" → ["Fas", "cin", "ating"]</p>
+              <div class="arch-detail">Each word becomes 1-4 tokens. Token IDs are mapped to integers. GPT-4 uses ~100K
+                token vocabulary with Byte-Pair Encoding (BPE).</div>
+            </div>
+          </div>
+          <div style="padding-left:60px;">
+            <div class="arch-connector"></div>
+          </div>
+          <div class="arch-step" onclick="toggleArch(this)">
+            <div class="arch-num">02</div>
+            <div class="arch-card">
+              <h4>🗺️ Embedding Layer</h4>
+              <p>Each token ID is converted to a dense vector (e.g. 768 or 4096 numbers)</p>
+              <div class="arch-detail">Embeddings encode semantic meaning. Similar words have similar vectors.
+                Positional encodings are added to preserve word order.</div>
+            </div>
+          </div>
+          <div style="padding-left:60px;">
+            <div class="arch-connector"></div>
+          </div>
+          <div class="arch-step" onclick="toggleArch(this)">
+            <div class="arch-num">03</div>
+            <div class="arch-card">
+              <h4>👁️ Self-Attention</h4>
+              <p>Each token "attends" to every other token, weighing their relevance</p>
+              <div class="arch-detail">For "The cat sat on it", the model learns that "it" attends strongly to "cat".
+                Multi-head attention runs this in parallel with different perspectives.</div>
+            </div>
+          </div>
+          <div style="padding-left:60px;">
+            <div class="arch-connector"></div>
+          </div>
+          <div class="arch-step" onclick="toggleArch(this)">
+            <div class="arch-num">04</div>
+            <div class="arch-card">
+              <h4>🔁 Repeat × N Layers</h4>
+              <p>Attention + feedforward networks are stacked 12–96 times</p>
+              <div class="arch-detail">GPT-3 has 96 transformer layers. Each layer refines the representation. Deeper
+                layers capture abstract semantics; shallow layers capture syntax.</div>
+            </div>
+          </div>
+          <div style="padding-left:60px;">
+            <div class="arch-connector"></div>
+          </div>
+          <div class="arch-step" onclick="toggleArch(this)">
+            <div class="arch-num">05</div>
+            <div class="arch-card">
+              <h4>📊 Output Head</h4>
+              <p>A softmax layer outputs probabilities over the entire vocabulary</p>
+              <div class="arch-detail">The highest probability token is chosen (greedy) or sampled (top-k/top-p). This
+                one token is appended and the process repeats until done.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ATTENTION VIZ -->
+      <div>
+        <h3 style="font-family:'Syne',sans-serif;font-size:24px;font-weight:700;margin-bottom:16px;">🔍 Attention
+          Visualizer</h3>
+        <p style="color:var(--text-dim);font-size:15px;line-height:1.8;margin-bottom:24px;">Click a word to see which
+          other words it "attends to" most strongly.</p>
+        <div class="attention-demo">
+          <p class="attn-label">CLICK A WORD TO SEE ATTENTION</p>
+          <div class="attn-sentence" id="attnSentence"></div>
+          <p class="attn-label">ATTENTION WEIGHTS → (brighter = stronger attention)</p>
+          <div class="attn-heatmap" id="attnHeatmap"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TOKEN PREDICTOR -->
+    <div class="predictor-box">
+      <h3 style="font-family:'Syne',sans-serif;font-size:22px;font-weight:700;margin-bottom:8px;">🎲 Token Predictor —
+        How Generation Works</h3>
+      <p class="hint" style="color:var(--text-muted);font-size:14px;margin-bottom:24px;">Click a predicted token to add
+        it to the sequence — exactly how LLMs generate text one step at a time</p>
+      <div class="predictor-display" id="predictorDisplay"></div>
+      <p class="attn-label" style="margin-bottom:12px;">NEXT TOKEN CANDIDATES (with probability):</p>
+      <div class="predictions-list" id="predictionsList"></div>
+      <div style="display:flex;gap:12px;">
+        <button class="btn btn-ghost" onclick="resetPredictor()" style="font-size:14px;padding:10px 20px;">↺
+          Reset</button>
+        <button class="btn btn-primary" onclick="autoGenerate()" style="font-size:14px;padding:10px 20px;">▶ Auto
+          Generate</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ── SECTION 3: HISTORY ── -->
+  <section id="history">
+    <p class="section-tag">Section 03 · Evolution</p>
+    <h2>A Brief History<br>of LLMs</h2>
+    <p class="section-lead">From n-grams that memorized word pairs to trillion-parameter models — the journey is one of
+      relentless scale, architecture, and data.</p>
+
+    <div class="timeline" id="timeline">
+      <div class="timeline-line"></div>
+
+      <div class="timeline-item">
+        <div class="timeline-year">Pre-2012</div>
+        <div class="timeline-dot"></div>
+        <div class="timeline-content">
+          <div class="timeline-model">Early NLP Era</div>
+          <p class="timeline-desc">Rule-based systems and statistical models (n-grams, TF-IDF) dominated. They could
+            classify text but couldn't capture deep meaning or generate fluent language.</p>
+          <div class="timeline-badge"><span class="chip">Rule-Based</span> <span class="chip purple">N-Grams</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="timeline-item">
+        <div class="timeline-year">2013</div>
+        <div class="timeline-dot"></div>
+        <div class="timeline-content">
+          <div class="timeline-model">Word2Vec — Google</div>
+          <p class="timeline-desc">Tomas Mikolov's Word2Vec mapped words to continuous vectors. King – Man + Woman ≈
+            Queen. The era of word embeddings began, allowing semantic relationships.</p>
+          <div class="timeline-badge"><span class="chip green">Word Embeddings</span></div>
+        </div>
+      </div>
+
+      <div class="timeline-item">
+        <div class="timeline-year">2017</div>
+        <div class="timeline-dot"></div>
+        <div class="timeline-content">
+          <div class="timeline-model">Transformers — "Attention Is All You Need"</div>
+          <p class="timeline-desc">Google Brain's landmark paper introduced the Transformer architecture with
+            self-attention. It eliminated RNNs and enabled massive parallelization — the foundation for everything
+            modern.</p>
+          <div class="timeline-badge"><span class="chip">Self-Attention</span> <span
+              class="chip purple">Parallelization</span></div>
+        </div>
+      </div>
+
+      <div class="timeline-item">
+        <div class="timeline-year">2018</div>
+        <div class="timeline-dot"></div>
+        <div class="timeline-content">
+          <div class="timeline-model">BERT + GPT-1</div>
+          <p class="timeline-desc">BERT (Google) used bidirectional context for understanding tasks. GPT-1 (OpenAI) used
+            unidirectional generation. Both proved pretraining + finetuning worked powerfully.</p>
+          <div class="timeline-badge"><span class="chip green">Bidirectional BERT</span> <span class="chip purple">GPT
+              Generation</span></div>
+        </div>
+      </div>
+
+      <div class="timeline-item">
+        <div class="timeline-year">2020</div>
+        <div class="timeline-dot"></div>
+        <div class="timeline-content">
+          <div class="timeline-model">GPT-3 — 175 Billion Parameters</div>
+          <p class="timeline-desc">OpenAI's GPT-3 shocked the world with few-shot learning — it could do tasks it was
+            never trained on, just from a few examples in the prompt. Scale proved to be the answer.</p>
+          <div class="timeline-badge"><span class="chip">175B Params</span> <span class="chip purple">Few-Shot</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="timeline-item">
+        <div class="timeline-year">2022–23</div>
+        <div class="timeline-dot"></div>
+        <div class="timeline-content">
+          <div class="timeline-model">ChatGPT · Claude · Gemini · LLaMA</div>
+          <p class="timeline-desc">RLHF (Reinforcement Learning from Human Feedback) made models safe, helpful, and
+            conversational. The public AI era began. Open-source models like LLaMA democratized access.</p>
+          <div class="timeline-badge"><span class="chip green">RLHF</span> <span class="chip">Open Source</span> <span
+              class="chip purple">Conversational</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ── SECTION 4: RAG ── -->
+  <section id="rag">
+    <p class="section-tag">Section 04 · Advanced Architecture</p>
+    <h2>RAG — Retrieval-Augmented<br>Generation</h2>
+    <p class="section-lead">LLMs know only what was in their training data. RAG connects them to live, external
+      knowledge — making them more accurate and current.</p>
+
+    <!-- RAG FLOW DIAGRAM -->
+    <div class="rag-flow">
+      <div class="rag-node">
+        <div class="rag-icon">👤</div>
+        <div class="rag-label">User Query</div>
+        <div class="rag-desc">"What's our return policy?"</div>
+      </div>
+      <div class="rag-arrow">→</div>
+      <div class="rag-node">
+        <div class="rag-icon">🔍</div>
+        <div class="rag-label">Retriever</div>
+        <div class="rag-desc">Searches vector DB for relevant docs</div>
+      </div>
+      <div class="rag-arrow">→</div>
+      <div class="rag-node">
+        <div class="rag-icon">📄</div>
+        <div class="rag-label">Context</div>
+        <div class="rag-desc">Top-k relevant chunks retrieved</div>
+      </div>
+      <div class="rag-arrow">→</div>
+      <div class="rag-node">
+        <div class="rag-icon">🤖</div>
+        <div class="rag-label">LLM Generator</div>
+        <div class="rag-desc">Generates answer using context + prompt</div>
+      </div>
+      <div class="rag-arrow">→</div>
+      <div class="rag-node">
+        <div class="rag-icon">✅</div>
+        <div class="rag-label">Grounded Answer</div>
+        <div class="rag-desc">Accurate, cited, up-to-date response</div>
+      </div>
+    </div>
+
+    <!-- PROBLEMS RAG SOLVES -->
+    <h3 style="font-family:'Syne',sans-serif;font-size:22px;font-weight:700;margin-bottom:20px;">Problems RAG Solves
+    </h3>
+    <div class="rag-problem-cards" style="margin-bottom:48px;">
+      <div class="rag-problem">
+        <div class="prob-icon">🌀</div>
+        <div>
+          <div class="prob-title">Hallucination</div>
+          <p class="prob-text">LLMs confidently generate false facts because they're guessing from training patterns.
+          </p>
+          <p class="prob-sol">✓ RAG anchors answers in real retrieved documents</p>
+        </div>
+      </div>
+      <div class="rag-problem">
+        <div class="prob-icon">📅</div>
+        <div>
+          <div class="prob-title">Outdated Knowledge</div>
+          <p class="prob-text">Training data has a cutoff date. Events after that are unknown to the model.</p>
+          <p class="prob-sol">✓ RAG fetches fresh data from live databases</p>
+        </div>
+      </div>
+      <div class="rag-problem">
+        <div class="prob-icon">🏢</div>
+        <div>
+          <div class="prob-title">Domain-Specific Needs</div>
+          <p class="prob-text">LLMs don't know your company's internal docs, policies, or proprietary data.</p>
+          <p class="prob-sol">✓ RAG connects to private corpora and PDFs</p>
+        </div>
+      </div>
+      <div class="rag-problem">
+        <div class="prob-icon">📦</div>
+        <div>
+          <div class="prob-title">Context Window Limits</div>
+          <p class="prob-text">You can't stuff an entire database into a prompt — context windows are finite.</p>
+          <p class="prob-sol">✓ RAG dynamically injects only the most relevant info</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-block">
+      <h4>🛠️ RAG Pipeline Components</h4>
+      <ul>
+        <li><strong>Embedding Model</strong> — Converts text into dense vectors (e.g. sentence-transformers, OpenAI ada)
+        </li>
+        <li><strong>Vector Store</strong> — Stores and indexes embeddings for fast similarity search (FAISS, Pinecone,
+          Weaviate)</li>
+        <li><strong>Retriever</strong> — Searches vector store for top-k semantically similar chunks to the query</li>
+        <li><strong>LLM Generator</strong> — Uses retrieved context + user query to generate a grounded, cited response
+        </li>
+        <li><strong>Reranker (Optional)</strong> — Reorders retrieved results for higher relevance before passing to LLM
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ── SECTION 5: LIMITATIONS ── -->
+  <section>
+    <p class="section-tag">Section 05 · Critical Thinking</p>
+    <h2>Limitations of LLMs</h2>
+    <p class="section-lead">LLMs are powerful but imperfect. A good data scientist understands the failure modes.</p>
+
+    <div class="limit-grid">
+      <div class="limit-card">
+        <div class="limit-icon">🌀</div>
+        <div class="limit-title">Hallucination</div>
+        <p class="limit-text">Models generate plausible-sounding but completely false information with full confidence.
+        </p>
+      </div>
+      <div class="limit-card">
+        <div class="limit-icon">⚖️</div>
+        <div class="limit-title">Bias</div>
+        <p class="limit-text">Trained on internet text, LLMs inherit societal biases, stereotypes, and skewed
+          viewpoints.</p>
+      </div>
+      <div class="limit-card">
+        <div class="limit-icon">🧩</div>
+        <div class="limit-title">No True Understanding</div>
+        <p class="limit-text">They learn statistical patterns, not meaning. They can fail spectacularly on simple
+          reasoning.</p>
+      </div>
+      <div class="limit-card">
+        <div class="limit-icon">💸</div>
+        <div class="limit-title">Compute Cost</div>
+        <p class="limit-text">Training GPT-3 cost ~$4.6M. Running inference at scale requires expensive GPU clusters.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ── GLOSSARY ── -->
+  <section>
+    <p class="section-tag">Reference · Glossary</p>
+    <h2>Key Terms to Know</h2>
+    <div class="glossary-grid">
+      <div class="gloss-item">
+        <div class="gloss-term">TOKEN</div>
+        <div class="gloss-def">The basic unit of text an LLM processes. Can be a word, subword, or character. ~1 token ≈
+          0.75 words in English.</div>
+      </div>
+      <div class="gloss-item">
+        <div class="gloss-term">EMBEDDING</div>
+        <div class="gloss-def">A numerical vector representation of a token. Captures semantic meaning so similar words
+          have similar vectors in high-dimensional space.</div>
+      </div>
+      <div class="gloss-item">
+        <div class="gloss-term">SELF-ATTENTION</div>
+        <div class="gloss-def">A mechanism where each token weighs its relevance to all other tokens in the sequence,
+          allowing context-aware processing.</div>
+      </div>
+      <div class="gloss-item">
+        <div class="gloss-term">TRANSFORMER</div>
+        <div class="gloss-def">The neural network architecture (2017) at the core of all modern LLMs. Uses
+          self-attention and feedforward layers stacked in sequence.</div>
+      </div>
+      <div class="gloss-item">
+        <div class="gloss-term">PRETRAINING</div>
+        <div class="gloss-def">Initial training on massive text data using next-token prediction. Gives the model broad
+          language understanding before finetuning.</div>
+      </div>
+      <div class="gloss-item">
+        <div class="gloss-term">RLHF</div>
+        <div class="gloss-def">Reinforcement Learning from Human Feedback. Used to align models to be helpful, harmless,
+          and honest (ChatGPT, Claude).</div>
+      </div>
+      <div class="gloss-item">
+        <div class="gloss-term">RAG</div>
+        <div class="gloss-def">Retrieval-Augmented Generation. Combines a retriever (finds relevant docs) with an LLM
+          (generates grounded answers).</div>
+      </div>
+      <div class="gloss-item">
+        <div class="gloss-term">HALLUCINATION</div>
+        <div class="gloss-def">When an LLM generates confident, fluent, but factually incorrect content. A key
+          limitation of current models.</div>
+      </div>
+      <div class="gloss-item">
+        <div class="gloss-term">CONTEXT WINDOW</div>
+        <div class="gloss-def">The maximum number of tokens an LLM can process at once. GPT-4 Turbo supports 128K tokens
+          (~300 pages).</div>
+      </div>
+      <div class="gloss-item">
+        <div class="gloss-term">TOP-K / TOP-P SAMPLING</div>
+        <div class="gloss-def">Sampling strategies for token selection. Top-k picks from the k most likely tokens; top-p
+          picks from tokens summing to probability p.</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ── QUIZ ── -->
+  <section id="quiz">
+    <p class="section-tag">Section 06 · Test Yourself</p>
+    <h2>Knowledge Check</h2>
+    <p class="section-lead">Answer these questions to solidify your understanding of LLMs.</p>
+
+    <!-- Q1 -->
+    <div class="quiz-card">
+      <div class="quiz-question">Q1. What is the core training objective of a Large Language Model?</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(this, false, 'q1')">A. Classify images into categories</button>
+        <button class="quiz-opt" onclick="answer(this, true, 'q1')">B. Predict the next token given previous
+          tokens</button>
+        <button class="quiz-opt" onclick="answer(this, false, 'q1')">C. Find the shortest path in a graph</button>
+        <button class="quiz-opt" onclick="answer(this, false, 'q1')">D. Minimize reconstruction error in
+          autoencoders</button>
+      </div>
+      <div class="quiz-feedback" id="q1-fb"></div>
+    </div>
+
+    <!-- Q2 -->
+    <div class="quiz-card">
+      <div class="quiz-question">Q2. Which architecture paper in 2017 revolutionized NLP and became the foundation for
+        LLMs?</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(this, false, 'q2')">A. ImageNet Classification with Deep Convolutional
+          Neural Networks</button>
+        <button class="quiz-opt" onclick="answer(this, false, 'q2')">B. Playing Atari with Deep Reinforcement
+          Learning</button>
+        <button class="quiz-opt" onclick="answer(this, true, 'q2')">C. Attention Is All You Need (Vaswani et
+          al.)</button>
+        <button class="quiz-opt" onclick="answer(this, false, 'q2')">D. Generative Adversarial Nets</button>
+      </div>
+      <div class="quiz-feedback" id="q2-fb"></div>
+    </div>
+
+    <!-- Q3 -->
+    <div class="quiz-card">
+      <div class="quiz-question">Q3. What does "hallucination" mean in the context of LLMs?</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(this, false, 'q3')">A. The model crashes and shows visual
+          errors</button>
+        <button class="quiz-opt" onclick="answer(this, false, 'q3')">B. The model refuses to answer questions</button>
+        <button class="quiz-opt" onclick="answer(this, true, 'q3')">C. The model confidently generates plausible but
+          factually wrong information</button>
+        <button class="quiz-opt" onclick="answer(this, false, 'q3')">D. The model outputs random tokens with no
+          pattern</button>
+      </div>
+      <div class="quiz-feedback" id="q3-fb"></div>
+    </div>
+
+    <!-- Q4 -->
+    <div class="quiz-card">
+      <div class="quiz-question">Q4. In a RAG system, what is the role of the "Vector Store"?</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(this, false, 'q4')">A. Stores the LLM's model weights</button>
+        <button class="quiz-opt" onclick="answer(this, true, 'q4')">B. Stores embedded document chunks for fast
+          similarity search</button>
+        <button class="quiz-opt" onclick="answer(this, false, 'q4')">C. Converts natural language to SQL
+          queries</button>
+        <button class="quiz-opt" onclick="answer(this, false, 'q4')">D. Trains the LLM on new data</button>
+      </div>
+      <div class="quiz-feedback" id="q4-fb"></div>
+    </div>
+
+    <!-- Q5 -->
+    <div class="quiz-card">
+      <div class="quiz-question">Q5. What does RLHF stand for, and why is it used?</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(this, false, 'q5')">A. Recursive Language History Framework — to store
+          conversation history</button>
+        <button class="quiz-opt" onclick="answer(this, false, 'q5')">B. Random Layer Hyperparameter Fixing — to tune
+          model architecture</button>
+        <button class="quiz-opt" onclick="answer(this, true, 'q5')">C. Reinforcement Learning from Human Feedback — to
+          align models to be helpful and safe</button>
+        <button class="quiz-opt" onclick="answer(this, false, 'q5')">D. Rapid Language Hallucination Filter — to remove
+          incorrect outputs</button>
+      </div>
+      <div class="quiz-feedback" id="q5-fb"></div>
+    </div>
+
+    <div id="quizResults"
+      style="display:none; margin-top:24px; padding:32px; background:var(--panel); border:1px solid var(--border); border-radius:16px; text-align:center;">
+      <div style="font-size:48px; margin-bottom:16px;" id="resultsEmoji">🎉</div>
+      <h3 style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800;margin-bottom:8px;" id="resultsTitle">Well
+        Done!</h3>
+      <p style="color:var(--text-dim);font-size:16px;" id="resultsText">You scored 0/5</p>
+    </div>
+  </section>
+
+  <!-- SUMMARY BANNER -->
+  <div style="padding:0 40px 100px;max-width:1100px;margin:0 auto;">
+    <div class="summary-banner">
+      <h2>You've Covered the Essentials of LLMs</h2>
+      <p>From tokenization and transformers to RAG systems and limitations — you now have a solid foundation to build
+        on. The next step is building with LLMs in Python using the Anthropic or OpenAI APIs.</p>
+      <a href="#what" class="btn btn-primary">Review Again ↑</a>
+    </div>
+  </div>
+
+  <footer>
+    <div>Data Science Handbook — <span>Module 12: LLMs</span></div>
+    <div>Built for interactive learning · 2025</div>
+  </footer>
+
+  <script>
+    // ─── PROGRESS BAR ───
+    window.addEventListener('scroll', () => {
+      const pct = (window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100;
+      document.getElementById('progressFill').style.width = pct + '%';
+    });
+
+    // ─── NEURAL CANVAS ANIMATION ───
+    const canvas = document.getElementById('neuralCanvas');
+    const ctx = canvas.getContext('2d');
+    let nodes = [], W, H;
+    function resizeCanvas() {
+      W = canvas.width = canvas.offsetWidth;
+      H = canvas.height = canvas.offsetHeight;
+    }
+    function initNodes() {
+      nodes = Array.from({ length: 60 }, () => ({
+        x: Math.random() * W, y: Math.random() * H,
+        vx: (Math.random() - .5) * 0.4, vy: (Math.random() - .5) * 0.4,
+        r: Math.random() * 2 + 1
+      }));
+    }
+    function drawCanvas() {
+      ctx.clearRect(0, 0, W, H);
+      nodes.forEach(n => {
+        n.x += n.vx; n.y += n.vy;
+        if (n.x < 0 || n.x > W) n.vx *= -1;
+        if (n.y < 0 || n.y > H) n.vy *= -1;
+        ctx.beginPath(); ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(0,212,255,0.5)'; ctx.fill();
+      });
+      nodes.forEach((a, i) => nodes.slice(i + 1).forEach(b => {
+        const d = Math.hypot(a.x - b.x, a.y - b.y);
+        if (d < 120) {
+          ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y);
+          ctx.strokeStyle = `rgba(0,212,255,${0.15 * (1 - d / 120)})`; ctx.lineWidth = 1; ctx.stroke();
+        }
+      }));
+      requestAnimationFrame(drawCanvas);
+    }
+    resizeCanvas(); initNodes(); drawCanvas();
+    window.addEventListener('resize', () => { resizeCanvas(); initNodes(); });
+
+    // ─── TOKENIZER ───
+    const tokenColors = [
+      { bg: 'rgba(0,212,255,0.12)', border: 'rgba(0,212,255,0.4)', text: '#00d4ff' },
+      { bg: 'rgba(124,58,237,0.12)', border: 'rgba(124,58,237,0.4)', text: '#a78bfa' },
+      { bg: 'rgba(16,185,129,0.12)', border: 'rgba(16,185,129,0.4)', text: '#10b981' },
+      { bg: 'rgba(245,158,11,0.12)', border: 'rgba(245,158,11,0.4)', text: '#f59e0b' },
+      { bg: 'rgba(239,68,68,0.12)', border: 'rgba(239,68,68,0.4)', text: '#f87171' },
+    ];
+    function tokenize(text) {
+      if (!text.trim()) return [];
+      const tokens = [];
+      let i = 0;
+      while (i < text.length) {
+        if (text[i] === ' ') { tokens.push(' '); i++; continue; }
+        // Simple BPE-like simulation
+        const remainLen = Math.min(Math.floor(Math.random() * 4) + 2, text.length - i);
+        tokens.push(text.slice(i, i + remainLen));
+        i += remainLen;
+      }
+      return tokens.filter(t => t !== ' ');
+    }
+    function renderTokens() {
+      const input = document.getElementById('tokenizerInput').value;
+      const display = document.getElementById('tokenDisplay');
+      const tokens = tokenize(input);
+      display.innerHTML = '';
+      tokens.forEach((t, i) => {
+        const c = tokenColors[i % tokenColors.length];
+        const el = document.createElement('span');
+        el.className = 'token';
+        el.textContent = t.replace(/ /g, '·');
+        el.style.cssText = `background:${c.bg};border-color:${c.border};color:${c.text}`;
+        display.appendChild(el);
+      });
+      document.getElementById('tokenCount').textContent = tokens.length;
+      document.getElementById('charCount').textContent = input.length;
+      document.getElementById('costEst').textContent = `~$${(tokens.length * 0.000002).toFixed(6)}`;
+    }
+    document.getElementById('tokenizerInput').addEventListener('input', renderTokens);
+    renderTokens();
+
+    // ─── TRANSFORMER STEPS ───
+    function toggleArch(el) {
+      el.classList.toggle('active');
+    }
+
+    // ─── ATTENTION VISUALIZER ───
+    const attnSentence = ['The', 'cat', 'sat', 'on', 'the', 'mat', 'because', 'it', 'was', 'tired'];
+    const attnWeights = {
+      'The': [0.8, 0.1, 0.1, 0.05, 0.6, 0.05, 0.1, 0.1, 0.05, 0.05],
+      'cat': [0.2, 0.9, 0.3, 0.1, 0.1, 0.2, 0.3, 0.7, 0.2, 0.4],
+      'sat': [0.1, 0.5, 0.9, 0.4, 0.1, 0.6, 0.2, 0.3, 0.3, 0.2],
+      'on': [0.05, 0.1, 0.4, 0.9, 0.2, 0.7, 0.1, 0.1, 0.1, 0.1],
+      'the': [0.7, 0.1, 0.1, 0.2, 0.9, 0.5, 0.1, 0.1, 0.1, 0.1],
+      'mat': [0.1, 0.2, 0.6, 0.7, 0.4, 0.9, 0.1, 0.2, 0.1, 0.3],
+      'because': [0.05, 0.3, 0.2, 0.1, 0.05, 0.1, 0.9, 0.6, 0.4, 0.5],
+      'it': [0.1, 0.8, 0.3, 0.1, 0.2, 0.3, 0.5, 0.9, 0.3, 0.6],
+      'was': [0.05, 0.2, 0.3, 0.1, 0.1, 0.1, 0.4, 0.5, 0.9, 0.7],
+      'tired': [0.05, 0.4, 0.2, 0.1, 0.1, 0.3, 0.5, 0.6, 0.7, 0.9],
+    };
+    const sentEl = document.getElementById('attnSentence');
+    const heatEl = document.getElementById('attnHeatmap');
+    attnSentence.forEach(w => {
+      const el = document.createElement('span');
+      el.className = 'attn-word'; el.textContent = w;
+      el.onclick = () => showAttention(w, el);
+      sentEl.appendChild(el);
+    });
+    attnSentence.forEach(w => {
+      const el = document.createElement('span');
+      el.className = 'attn-cell'; el.textContent = w; el.id = 'heat-' + w;
+      heatEl.appendChild(el);
+    });
+    function showAttention(word, clickedEl) {
+      document.querySelectorAll('.attn-word').forEach(e => e.classList.remove('selected'));
+      clickedEl.classList.add('selected');
+      const weights = attnWeights[word];
+      attnSentence.forEach((w, i) => {
+        const heat = document.getElementById('heat-' + w);
+        const v = weights[i];
+        const r = Math.round(v * 220);
+        const g = Math.round(v * 100);
+        const b = Math.round(255 - v * 100);
+        heat.style.background = `rgba(${r},${g},${b},${0.1 + v * 0.5})`;
+        heat.style.color = v > 0.5 ? '#fff' : 'var(--text-dim)';
+        heat.style.transform = `scale(${0.9 + v * 0.2})`;
+        heat.style.fontWeight = v > 0.7 ? '700' : '400';
+      });
+    }
+    showAttention('it', document.querySelector('.attn-word:nth-child(8)'));
+
+    // ─── TOKEN PREDICTOR ───
+    const story = [
+      {
+        text: "The transformer model was", predictions: [
+          { tok: "trained", pct: 32 }, { tok: "designed", pct: 28 }, { tok: "built", pct: 18 }, { tok: "created", pct: 14 }, { tok: "first", pct: 8 }
+        ]
+      },
+      {
+        text: "trained on billions of tokens from the", predictions: [
+          { tok: "internet", pct: 38 }, { tok: "web", pct: 27 }, { tok: "entire", pct: 15 }, { tok: "largest", pct: 12 }, { tok: "public", pct: 8 }
+        ]
+      },
+      {
+        text: "internet. It learns to predict the", predictions: [
+          { tok: "next", pct: 55 }, { tok: "correct", pct: 18 }, { tok: "most", pct: 13 }, { tok: "following", pct: 9 }, { tok: "best", pct: 5 }
+        ]
+      },
+      {
+        text: "next token at every position,", predictions: [
+          { tok: "which", pct: 30 }, { tok: "allowing", pct: 25 }, { tok: "enabling", pct: 20 }, { tok: "and", pct: 15 }, { tok: "making", pct: 10 }
+        ]
+      },
+      {
+        text: "enabling it to generate", predictions: [
+          { tok: "coherent", pct: 35 }, { tok: "fluent", pct: 28 }, { tok: "human-like", pct: 22 }, { tok: "natural", pct: 10 }, { tok: "rich", pct: 5 }
+        ]
+      },
+      {
+        text: "coherent and meaningful text.", predictions: [
+          { tok: "This", pct: 40 }, { tok: "The", pct: 30 }, { tok: "Through", pct: 18 }, { tok: "Over", pct: 8 }, { tok: "By", pct: 4 }
+        ]
+      },
+    ];
+    let predIdx = 0, autoTimer = null;
+    function renderPredictor() {
+      const step = story[Math.min(predIdx, story.length - 1)];
+      document.getElementById('predictorDisplay').innerHTML = step.text + ' <span class="cursor-blink"></span>';
+      const list = document.getElementById('predictionsList');
+      list.innerHTML = '';
+      step.predictions.forEach(p => {
+        const el = document.createElement('div');
+        el.className = 'pred-token';
+        el.innerHTML = `<span>${p.tok}</span><div class="pred-bar" style="width:${p.pct * 1.5}px"></div><span class="pred-pct">${p.pct}%</span>`;
+        el.onclick = () => { selectToken(p.tok); };
+        list.appendChild(el);
+        setTimeout(() => el.querySelector('.pred-bar').style.width = (p.pct * 1.5) + 'px', 50);
+      });
+    }
+    function selectToken(tok) {
+      if (predIdx < story.length - 1) predIdx++;
+      renderPredictor();
+    }
+    function resetPredictor() {
+      predIdx = 0; clearInterval(autoTimer); autoTimer = null; renderPredictor();
+      document.querySelector('[onclick="autoGenerate()"]').textContent = '▶ Auto Generate';
+    }
+    function autoGenerate() {
+      if (autoTimer) { clearInterval(autoTimer); autoTimer = null; document.querySelector('[onclick="autoGenerate()"]').textContent = '▶ Auto Generate'; return; }
+      document.querySelector('[onclick="autoGenerate()"]').textContent = '⏸ Pause';
+      autoTimer = setInterval(() => {
+        if (predIdx >= story.length - 1) { clearInterval(autoTimer); autoTimer = null; document.querySelector('[onclick="autoGenerate()"]').textContent = '▶ Auto Generate'; return; }
+        predIdx++; renderPredictor();
+      }, 1500);
+    }
+    renderPredictor();
+
+    // ─── TIMELINE INTERSECTION OBSERVER ───
+    const timelineItems = document.querySelectorAll('.timeline-item');
+    const obs = new IntersectionObserver(entries => {
+      entries.forEach((e, i) => {
+        if (e.isIntersecting) {
+          setTimeout(() => e.target.classList.add('visible'), e.target.dataset.delay || 0);
+        }
+      });
+    }, { threshold: 0.2 });
+    timelineItems.forEach((item, i) => {
+      item.dataset.delay = i * 100;
+      obs.observe(item);
+    });
+
+    // ─── QUIZ ───
+    const feedbacks = {
+      q1: {
+        correct: "✓ Correct! LLMs are trained using 'next token prediction' — given a sequence of tokens, predict what comes next. This simple objective, applied to massive datasets, teaches the model language, facts, and reasoning.",
+        wrong: "✗ Not quite. The core training objective is 'next token prediction' — the model learns by repeatedly trying to predict what word comes next in a sequence."
+      },
+      q2: {
+        correct: "✓ Correct! 'Attention Is All You Need' (Vaswani et al., 2017) introduced the Transformer architecture and the self-attention mechanism, which became the foundation for BERT, GPT, and every modern LLM.",
+        wrong: "✗ Not quite. The paper is 'Attention Is All You Need' by Vaswani et al. (2017), which introduced the Transformer architecture and self-attention mechanisms."
+      },
+      q3: {
+        correct: "✓ Correct! Hallucination is when an LLM generates text that sounds authoritative and fluent but contains factually wrong information — because the model is statistically predicting, not truly 'knowing'.",
+        wrong: "✗ Not quite. Hallucination refers to when LLMs confidently generate plausible-sounding but factually incorrect information."
+      },
+      q4: {
+        correct: "✓ Correct! The Vector Store (e.g., FAISS, Pinecone) stores embedded document chunks as dense vectors, enabling fast semantic similarity search when a user query comes in.",
+        wrong: "✗ Not quite. The Vector Store stores document embeddings (vector representations) for fast semantic similarity search during retrieval."
+      },
+      q5: {
+        correct: "✓ Correct! RLHF = Reinforcement Learning from Human Feedback. Human raters score model outputs, and the model is fine-tuned to produce more helpful, harmless, and honest responses. This is how ChatGPT and Claude were aligned.",
+        wrong: "✗ Not quite. RLHF stands for Reinforcement Learning from Human Feedback — a technique used to align LLMs to human values and make them safe and helpful."
+      }
+    };
+    let answers = {};
+    function answer(btn, correct, qid) {
+      if (answers[qid] !== undefined) return;
+      answers[qid] = correct;
+      const opts = btn.parentNode.querySelectorAll('.quiz-opt');
+      opts.forEach(o => { o.style.pointerEvents = 'none'; });
+      btn.classList.add(correct ? 'correct' : 'wrong');
+      if (!correct) {
+        opts.forEach(o => { if (o.onclick.toString().includes('true')) o.classList.add('correct'); });
+      }
+      const fb = document.getElementById(qid + '-fb');
+      const info = feedbacks[qid];
+      fb.textContent = correct ? info.correct : info.wrong;
+      fb.className = `quiz-feedback show ${correct ? 'correct-fb' : 'wrong-fb'}`;
+
+      if (Object.keys(answers).length === 5) {
+        const score = Object.values(answers).filter(v => v).length;
+        const res = document.getElementById('quizResults');
+        res.style.display = 'block';
+        document.getElementById('resultsEmoji').textContent = score >= 4 ? '🏆' : score >= 3 ? '🎯' : score >= 2 ? '📚' : '💪';
+        document.getElementById('resultsTitle').textContent = score === 5 ? 'Perfect Score!' : score >= 4 ? 'Excellent!' : score >= 3 ? 'Good Job!' : 'Keep Practicing!';
+        document.getElementById('resultsText').textContent = `You scored ${score}/5 — ${score === 5 ? 'You have mastered LLM fundamentals!' : score >= 3 ? 'Solid understanding of LLMs!' : 'Review the sections above and try again!'}`;
+        res.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+  </script>
 </body>
+
 </html>
